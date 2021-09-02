@@ -50,7 +50,9 @@ function audio_remain(){
 	return (audio_write_cursor - audio_read_cursor) & SAMPLE_MASK;
 }
 
-function audio_callback(event){
+function audio_callback(event) {
+	if (nes.rom == null) return;
+
 	var dst = event.outputBuffer;
 	var len = dst.length;
 
@@ -68,7 +70,7 @@ function audio_callback(event){
 	audio_read_cursor = (audio_read_cursor + len) & SAMPLE_MASK;
 }
 
-function keyboard(callback, event){
+function keyboard(callback, event) {
 	var player = 1;
 	var prevent = true;
 	switch(event.keyCode){
@@ -332,3 +334,137 @@ window.addEventListener("gamepaddisconnected", disconnecthandler);
 if (!haveEvents) {
  setInterval(scangamepads, 500);
 }
+
+$(window).resize(function() {
+	resize();
+});
+
+function resize() {
+	let h = window.screen.availHeight
+  	let w = window.screen.availWidth
+  	if (h > w) {
+		console.log("Show touch controls");
+		$(".nes-div").width("100%");
+		let newWidth = $(".nes-div").width();
+		$(".nes-div").height(240 * (newWidth / 256));
+		$(".controls").show();
+		console.log("Mobile mode");
+	}
+	else {
+		$(".nes-div").height("100%");
+		let newHeight = $(".nes-div").height();
+		$(".nes-div").width(256 * (newHeight / 240));
+		$(".controls").hide();
+		console.log("Desktop mode");
+	}
+}
+
+$(document).ready(function() {
+	resize();
+	document.getElementById("gamepad").ontouchstart = buttonPress;
+	document.getElementById("gamepad").ontouchmove = buttonPress;
+	document.getElementById("gamepad").ontouchend = buttonPress;
+	nes_load_url("nes-canvas", "main.nes");
+});
+
+function isButtonDown(eventType) {
+	return eventType.endsWith("start") || eventType.endsWith("move");
+}
+
+function fnNesButtonPress(eventType) {
+	if (isButtonDown(eventType)) {
+		return nes.buttonDown;
+	}
+	return nes.buttonUp;
+}
+
+var childButton = {};
+
+function buttonPress(event) {
+	event.preventDefault();
+
+	// if (!document.fullscreenElement) {
+	// 	var elx = document.querySelector("#all");
+	// 	// make the element go to full-screen mode
+	// 	elx.requestFullscreen()
+	// 		.then(function() {
+	// 			// element has entered fullscreen mode successfully
+	// 		})
+	// 		.catch(function(error) {
+	// 			// element could not enter fullscreen mode
+	// 		});
+	// }
+
+	const eventType = event.type;
+	const touch = event.changedTouches[0];
+	const src = event.srcElement;
+	const element = $(document.elementFromPoint(touch.clientX, touch.clientY))[0];
+
+	if (eventType.endsWith("start")) {
+		childButton[src.id] = element;
+	}
+	else if (childButton[src.id].id != element.id) {
+		let lastButton = childButton[src.id];
+		if (lastButton.id.startsWith("BUTTON")) {
+			nes.buttonUp(1, eval("jsnes.Controller." + lastButton.id));
+			// Debug
+			//console.log("Released", lastButton.id);
+			$(lastButton).css("background-color", "yellow");
+		}
+		childButton[src.id] = element;
+	}
+
+	if (element.id.startsWith("BUTTON")) {
+		// Send button interaction to the emulator
+		let fn = fnNesButtonPress(eventType)
+		fn(1, eval("jsnes.Controller." + element.id));
+
+		// Debug
+		if (isButtonDown(eventType)) {
+			//console.log("Pressed", element.id);
+			$(element).css("background-color", "red");
+		}
+		else {
+			//console.log("Released", element.id);
+			$(element).css("background-color", "yellow");
+		}
+	}
+}
+
+
+// function buttonPress(event) {
+// 	event.preventDefault();
+//
+// 	let eventType = event.type;
+// 	let element = event.srcElement;
+//
+// 	// Handle finger slides
+// 	if (eventType.endsWith("move") || eventType.endsWith("end")) {
+// 		let touch = event.changedTouches[0];
+//     	dstElement = $(document.elementFromPoint(touch.clientX, touch.clientY))[0];
+// 		if (dstElement.id.startsWith("BUTTON") && dstElement.id != event.srcElement.id) {
+// 			element = dstElement;
+// 			nes.buttonUp(1, eval("jsnes.Controller." + event.srcElement.id));
+// 			// Add to list of childButtonren
+//  			// Debug
+// 			// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+// 			$(event.srcElement).css("background-color", "yellow");
+// 			console.log(eventType, "- Slide from", event.srcElement.id, "to", element.id);
+// 			// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+// 		}
+// 	}
+//
+// 	// Send button interaction to the emulator
+// 	let fn = fnNesButtonPress(eventType)
+// 	fn(1, eval("jsnes.Controller." + element.id));
+//
+// 	// Debug
+// 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+// 	if (isButtonDown(eventType)) {
+// 		$(element).css("background-color", "red");
+// 	}
+// 	else {
+// 		$(element).css("background-color", "yellow");
+// 	}
+// 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+// }
