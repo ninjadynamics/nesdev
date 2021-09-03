@@ -357,6 +357,18 @@ function resize() {
 		$(".controls").hide();
 		console.log("Desktop mode");
 	}
+
+	if (
+		!document.fullscreenElement &&
+		!document.mozFullScreenElement &&
+		!document.webkitFullscreenElement
+	) {
+	  $("#toggleFullScreen").css("background-color", "green");
+	}
+	else {
+	  $("#toggleFullScreen").css("background-color", "red");
+	}
+
 }
 
 function isIOSDevice(){
@@ -366,8 +378,6 @@ function isIOSDevice(){
 $(document).ready(function() {
 	resize();
 	isIOSDevice() && $("#toggleFullScreen").hide();
-	document.getElementById("toggleFullScreen").ontouchstart = toggleFullScreen;
-	document.getElementById("toggleFullScreen").ontouchmove = toggleFullScreen;
 	document.getElementById("toggleFullScreen").ontouchend = toggleFullScreen;
 	document.getElementById("gamepad").ontouchstart = buttonPress;
 	document.getElementById("gamepad").ontouchmove = buttonPress;
@@ -485,13 +495,8 @@ function toggleFullScreen(event) {
 			document.mozCancelFullScreen();
 		} else if (document.webkitCancelFullScreen) {
 			document.webkitCancelFullScreen();
+		} else if (document.msExitFullscreen) {
+			document.msExitFullscreen();
 		}
   	}
-
-	if (isButtonDown(event.type)) {
-	  $(event.srcElement).css("background-color", "red");
-	}
-	else {
-	  $(event.srcElement).css("background-color", "green");
-	}
 }
