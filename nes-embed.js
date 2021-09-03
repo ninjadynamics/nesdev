@@ -359,8 +359,16 @@ function resize() {
 	}
 }
 
+function isIOSDevice(){
+   return !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
+}
+
 $(document).ready(function() {
 	resize();
+	isIOSDevice() && $("#toggleFullScreen").hide();
+	document.getElementById("toggleFullScreen").ontouchstart = toggleFullScreen;
+	document.getElementById("toggleFullScreen").ontouchmove = toggleFullScreen;
+	document.getElementById("toggleFullScreen").ontouchend = toggleFullScreen;
 	document.getElementById("gamepad").ontouchstart = buttonPress;
 	document.getElementById("gamepad").ontouchmove = buttonPress;
 	document.getElementById("gamepad").ontouchend = buttonPress;
@@ -378,93 +386,112 @@ function fnNesButtonPress(eventType) {
 	return nes.buttonUp;
 }
 
+// This object is necessary to handle the user
+// sliding their finger from one button to another
 var childButton = {};
 
 function buttonPress(event) {
+	// Prevent all the shenanigans that happen with a "long-press" on mobile
 	event.preventDefault();
 
-	// if (!document.fullscreenElement) {
-	// 	var elx = document.querySelector("#all");
-	// 	// make the element go to full-screen mode
-	// 	elx.requestFullscreen()
-	// 		.then(function() {
-	// 			// element has entered fullscreen mode successfully
-	// 		})
-	// 		.catch(function(error) {
-	// 			// element could not enter fullscreen mode
-	// 		});
-	// }
+	// Used for debugging purposes
+	let released = null;
 
-	const eventType = event.type;
-	const touch = event.changedTouches[0];
+	// Get the source element and event type
 	const src = event.srcElement;
-	const element = $(document.elementFromPoint(touch.clientX, touch.clientY))[0];
+	const eventType = event.type;
 
-	if (eventType.endsWith("start")) {
-		childButton[src.id] = element;
-	}
-	else if (childButton[src.id].id != element.id) {
-		let lastButton = childButton[src.id];
-		if (lastButton.id.startsWith("BUTTON")) {
-			nes.buttonUp(1, eval("jsnes.Controller." + lastButton.id));
-			// Debug
-			//console.log("Released", lastButton.id);
-			$(lastButton).css("background-color", "yellow");
+	// Handle the touch
+	for (const touch of event.changedTouches) {
+		// Ignore any touches where the target
+		// element doesn't match the source element
+		if (touch.target.id != src.id) continue;
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+		// Get the element (either a button or the empty area of the gamepad)
+		// the user is physically touching right now
+		let element = $(document.elementFromPoint(touch.clientX, touch.clientY))[0];
+
+		// If it's a new touch, set the child button to its parent
+		if (eventType == "touchstart") {
+			childButton[src.id] = element;
 		}
-		childButton[src.id] = element;
-	}
-
-	if (element.id.startsWith("BUTTON")) {
-		// Send button interaction to the emulator
-		let fn = fnNesButtonPress(eventType)
-		fn(1, eval("jsnes.Controller." + element.id));
-
-		// Debug
-		if (isButtonDown(eventType)) {
-			//console.log("Pressed", element.id);
-			$(element).css("background-color", "red");
+		// Otherwise, if the user is sliding its finger from one button to another
+		// or simply stops touching the screen with that finger
+		else if (childButton[src.id].id != element.id) {
+			// Check which button (if any) the user had its finger on previously
+			let lastButton = childButton[src.id];
+			// If the user was actually pressing a button before
+			if (lastButton.id.startsWith("BUTTON")) {
+				// Tell the emulator to release that button
+				nes.buttonUp(1, eval("jsnes.Controller." + lastButton.id));
+				released = lastButton; // Faster debugging (?)
+			}
+			// Update the child button to be the one the user is touching right now
+			childButton[src.id] = element;
 		}
-		else {
-			//console.log("Released", element.id);
-			$(element).css("background-color", "yellow");
+
+		// If the user is actually interacting a button right now
+		if (element.id.startsWith("BUTTON")) {
+			// Send that button interaction to the emulator
+			let fn = fnNesButtonPress(eventType)
+			fn(1, eval("jsnes.Controller." + element.id));
+
+			// Show button presses / releases for the
+			// current button the user is interacting with
+			if (isButtonDown(eventType)) {
+				//console.log("Pressed", element.id);
+				$(element).css("background-color", "red");
+			}
+			else {
+				//console.log("Released", element.id);
+				$(element).css("background-color", "yellow");
+			}
+		}
+
+		// Show button release for the last button
+		// the user interacted with (if necessary)
+		if (released) {
+			//console.log("Released", released.id);
+			$(released).css("background-color", "yellow");
 		}
 	}
 }
 
+// Only works for Android devices
+function toggleFullScreen(event) {
+	let element = document.querySelector("#all");
+	if (
+		!document.fullscreenElement &&
+   		!document.mozFullScreenElement &&
+		!document.webkitFullscreenElement
+	) {
+		if (element.requestFullScreen) {
+		     element.requestFullScreen();
+		} else if (element.webkitRequestFullScreen) {
+		     element.webkitRequestFullScreen();
+		} else if (element.mozRequestFullScreen) {
+		     element.mozRequestFullScreen();
+		} else if (element.msRequestFullscreen) {
+		     element.msRequestFullscreen();
+		} else if (element.webkitEnterFullscreen) {
+		    element.webkitEnterFullscreen(); //for iphone this code worked
+		}
+  	}
+	else {
+		if (document.cancelFullScreen) {
+			document.cancelFullScreen();
+		} else if (document.mozCancelFullScreen) {
+			document.mozCancelFullScreen();
+		} else if (document.webkitCancelFullScreen) {
+			document.webkitCancelFullScreen();
+		}
+  	}
 
-// function buttonPress(event) {
-// 	event.preventDefault();
-//
-// 	let eventType = event.type;
-// 	let element = event.srcElement;
-//
-// 	// Handle finger slides
-// 	if (eventType.endsWith("move") || eventType.endsWith("end")) {
-// 		let touch = event.changedTouches[0];
-//     	dstElement = $(document.elementFromPoint(touch.clientX, touch.clientY))[0];
-// 		if (dstElement.id.startsWith("BUTTON") && dstElement.id != event.srcElement.id) {
-// 			element = dstElement;
-// 			nes.buttonUp(1, eval("jsnes.Controller." + event.srcElement.id));
-// 			// Add to list of childButtonren
-//  			// Debug
-// 			// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-// 			$(event.srcElement).css("background-color", "yellow");
-// 			console.log(eventType, "- Slide from", event.srcElement.id, "to", element.id);
-// 			// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-// 		}
-// 	}
-//
-// 	// Send button interaction to the emulator
-// 	let fn = fnNesButtonPress(eventType)
-// 	fn(1, eval("jsnes.Controller." + element.id));
-//
-// 	// Debug
-// 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-// 	if (isButtonDown(eventType)) {
-// 		$(element).css("background-color", "red");
-// 	}
-// 	else {
-// 		$(element).css("background-color", "yellow");
-// 	}
-// 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-// }
+	if (isButtonDown(event.type)) {
+	  $(event.srcElement).css("background-color", "red");
+	}
+	else {
+	  $(event.srcElement).css("background-color", "green");
+	}
+}
