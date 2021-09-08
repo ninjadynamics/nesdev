@@ -5,6 +5,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<script src="https://unpkg.com/image-map-resizer@1.0.10/js/imageMapResizer.min.js"></script>
 	<script src="https://unpkg.com/jsnes/dist/jsnes.min.js"></script>
+	<script src="gamepad.js"></script>
 	<script src="nes-embed.js"></script>
 </head>
 <body id="all">
@@ -41,116 +42,135 @@
 		}
 
 		.controls {
-			margin: 0px;
 			position: relative;
+			background-color: blue;
 			width: 100%;
-			background-color: yellow;
-
 		}
 
 		.button_B {
 		    position:absolute;
-		    left: 64%;
-		    top: 34%;
-			width: 7%;
-			padding: 7%;
+		    left: 60vw;
+		    top: 22vw;
+			width: 18vw;
+			height: 18vw;
 			box-sizing: border-box;
 			background-color: yellow;
 			border-radius: 50%;
+
+			text-align: center;
+			display: flex;
+		    justify-content: center;
+		    align-content: center;
+		    flex-direction: column;
+			font-family: monospace;
 		}
 
 		.button_A {
 		    position:absolute;
-			left: 82%;
-	        top: 21%;
-			width: 7%;
-			padding: 7%;
+			left: 78vw;
+	        top: 10vw;
+			width: 18vw;
+			height: 18vw;
 			box-sizing: border-box;
 			background-color: yellow;
 			border-radius: 50%;
+
+			text-align: center;
+			display: flex;
+		    justify-content: center;
+		    align-content: center;
+		    flex-direction: column;
+			font-family: monospace;
 		}
 
-		.button_LEFT {
+		.dpad {
 		    position:absolute;
-		    left: 2%;
-		    top: 33.1%;
-			width: 10%;
-			padding: 5%;
-			box-sizing: border-box;
-			background-color: yellow;
-		}
-
-		.button_RIGHT {
-		    position:absolute;
-			left: 22%;
-		    top: 33.1%;
-			width: 10%;
-			padding: 5%;
-			box-sizing: border-box;
-			background-color: yellow;
-		}
-
-		.button_UP {
-		    position:absolute;
-		    left: 12.1%;
-		    top: 18%;
-			width: 10%;
-			padding: 5%;
-			box-sizing: border-box;
-			background-color: yellow;
-		}
-
-		.button_DOWN {
-		    position:absolute;
-			left: 12.1%;
-		    top: 48.5%;
-			width: 10%;
-			padding: 5%;
-			box-sizing: border-box;
-			background-color: yellow;
+		    left: 4vw;
+		    top: 12vw;
+			width: 35vw;
+			height: 35vw;
 		}
 
 		.button_SELECT {
 		    position:absolute;
-		    left: 36%;
-		    top: 70%;
-			width: 10%;
+			left: 45vw;
+		    top: 24vw;
+			width: 10vw;
 			padding: 2%;
 			box-sizing: border-box;
 			background-color: yellow;
+			align-items: center;
+			justify-content: center;
 		}
 
 		.button_START {
 		    position:absolute;
-			left: 50%;
-		    top: 70%;
-			width: 10%;
-			padding: 2%;
+			left: 45vw;
+		    top: 33vw;
+			width: 10vw;
+			padding: 2vw;
 			box-sizing: border-box;
 			background-color: yellow;
+			align-items: center;
+			justify-content: center;
 		}
 
 		.fullscreenButton {
 		    position:absolute;
-			left: 45%;
-		    top: 10%;
-			width: 10%;
-			padding: 2%;
+			left: 45vw;
+		    top: 3vw;
+			width: 10vw;
+			padding: 2vw;
 			box-sizing: border-box;
 			background-color: green;
+		}
+
+		.grid3x3 {
+			position: absolute;
+			left: 0%;
+			top: 0%;
+			width: 100%;
+			height: 100%;
+			display: grid;
+			grid-template-columns: 1fr 1fr 1fr;
+		    grid-template-rows: 1fr 1fr 1fr;
+		}
+
+		.box {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		[id^="BUTTON"] {
+			background: #BBB;
+			border: 3px;
+			border-style: outset;
+		}
+
+		#deadzone {
+			background: #444;
 		}
 	</style>
 	<div class="nes-div">
 		<canvas id="nes-canvas" width="256" height="240"></canvas>
 	</div>
-	<div class="controls" id="gamepad">
-		<img src="controls.png" style="width: 100%">
+	<div id="CONTROLLER" class="controls">
+		<div id="DPAD" class="dpad">
+			<div class="grid3x3">
+			    <div id="DIAG_UL" class="box"></div>
+			    <div id="BUTTON_UP" class="box"></div>
+			    <div id="DIAG_UR" class="box"></div>
+			    <div id="BUTTON_LEFT" class="box"></div>
+			    <div id="deadzone" class="box"></div>
+			    <div id="BUTTON_RIGHT" class="box"></div>
+			    <div id="DIAG_DL" class="box"></div>
+			    <div id="BUTTON_DOWN" class="box"></div>
+			    <div id="DIAG_DR" class="box"></div>
+			</div>
+		</div>
 		<div id="BUTTON_B" class="button_B"></div>
 		<div id="BUTTON_A" class="button_A"></div>
-		<div id="BUTTON_LEFT" class="button_LEFT"></div>
-		<div id="BUTTON_RIGHT" class="button_RIGHT"></div>
-		<div id="BUTTON_UP" class="button_UP"></div>
-		<div id="BUTTON_DOWN" class="button_DOWN"></div>
 		<div id="BUTTON_SELECT" class="button_SELECT"></div>
 		<div id="BUTTON_START" class="button_START"></div>
 		<div id="toggleFullScreen" class="fullscreenButton"></div>

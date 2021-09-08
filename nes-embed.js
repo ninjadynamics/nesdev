@@ -368,7 +368,6 @@ function resize() {
 	else {
 	  $("#toggleFullScreen").css("background-color", "red");
 	}
-
 }
 
 function isIOSDevice(){
@@ -379,124 +378,8 @@ $(document).ready(function() {
 	resize();
 	isIOSDevice() && $("#toggleFullScreen").hide();
 	document.getElementById("toggleFullScreen").ontouchend = toggleFullScreen;
-	document.getElementById("gamepad").ontouchstart = buttonPress;
-	document.getElementById("gamepad").ontouchmove = buttonPress;
-	document.getElementById("gamepad").ontouchend = buttonPress;
+	document.getElementById("CONTROLLER").ontouchstart = buttonPress;
+	document.getElementById("CONTROLLER").ontouchmove = buttonPress;
+	document.getElementById("CONTROLLER").ontouchend = buttonPress;
 	nes_load_url("nes-canvas", "main.nes");
 });
-
-function isButtonDown(eventType) {
-	return eventType.endsWith("start") || eventType.endsWith("move");
-}
-
-function fnNesButtonPress(eventType) {
-	if (isButtonDown(eventType)) {
-		return nes.buttonDown;
-	}
-	return nes.buttonUp;
-}
-
-// This object is necessary to handle the user
-// sliding their finger from one button to another
-var childButton = {};
-
-function buttonPress(event) {
-	// Prevent all the shenanigans that happen with a "long-press" on mobile
-	event.preventDefault();
-
-	// Used for debugging purposes
-	let released = null;
-
-	// Get the source element and event type
-	const src = event.srcElement;
-	const eventType = event.type;
-
-	// Handle the touch
-	for (const touch of event.changedTouches) {
-		// Ignore any touches where the target
-		// element doesn't match the source element
-		if (touch.target.id != src.id) continue;
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-		// Get the element (either a button or the empty area of the gamepad)
-		// the user is physically touching right now
-		let element = $(document.elementFromPoint(touch.clientX, touch.clientY))[0];
-
-		// If it's a new touch, set the child button to its parent
-		if (eventType == "touchstart") {
-			childButton[src.id] = element;
-		}
-		// Otherwise, if the user is sliding its finger from one button to another
-		// or simply stops touching the screen with that finger
-		else if (childButton[src.id].id != element.id) {
-			// Check which button (if any) the user had its finger on previously
-			let lastButton = childButton[src.id];
-			// If the user was actually pressing a button before
-			if (lastButton.id.startsWith("BUTTON")) {
-				// Tell the emulator to release that button
-				nes.buttonUp(1, eval("jsnes.Controller." + lastButton.id));
-				released = lastButton; // Faster debugging (?)
-			}
-			// Update the child button to be the one the user is touching right now
-			childButton[src.id] = element;
-		}
-
-		// If the user is actually interacting a button right now
-		if (element.id.startsWith("BUTTON")) {
-			// Send that button interaction to the emulator
-			let fn = fnNesButtonPress(eventType)
-			fn(1, eval("jsnes.Controller." + element.id));
-
-			// Show button presses / releases for the
-			// current button the user is interacting with
-			if (isButtonDown(eventType)) {
-				//console.log("Pressed", element.id);
-				$(element).css("background-color", "red");
-			}
-			else {
-				//console.log("Released", element.id);
-				$(element).css("background-color", "yellow");
-			}
-		}
-
-		// Show button release for the last button
-		// the user interacted with (if necessary)
-		if (released) {
-			//console.log("Released", released.id);
-			$(released).css("background-color", "yellow");
-		}
-	}
-}
-
-// Only works for Android devices
-function toggleFullScreen(event) {
-	let element = document.querySelector("#all");
-	if (
-		!document.fullscreenElement &&
-   		!document.mozFullScreenElement &&
-		!document.webkitFullscreenElement
-	) {
-		if (element.requestFullScreen) {
-		     element.requestFullScreen();
-		} else if (element.webkitRequestFullScreen) {
-		     element.webkitRequestFullScreen();
-		} else if (element.mozRequestFullScreen) {
-		     element.mozRequestFullScreen();
-		} else if (element.msRequestFullscreen) {
-		     element.msRequestFullscreen();
-		} else if (element.webkitEnterFullscreen) {
-		    element.webkitEnterFullscreen(); //for iphone this code worked
-		}
-  	}
-	else {
-		if (document.cancelFullScreen) {
-			document.cancelFullScreen();
-		} else if (document.mozCancelFullScreen) {
-			document.mozCancelFullScreen();
-		} else if (document.webkitCancelFullScreen) {
-			document.webkitCancelFullScreen();
-		} else if (document.msExitFullscreen) {
-			document.msExitFullscreen();
-		}
-  	}
-}
