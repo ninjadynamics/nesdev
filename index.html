@@ -54,7 +54,6 @@
 			width: 18vw;
 			height: 18vw;
 			box-sizing: border-box;
-			background-color: yellow;
 			border-radius: 50%;
 
 			text-align: center;
@@ -72,7 +71,23 @@
 			width: 18vw;
 			height: 18vw;
 			box-sizing: border-box;
-			background-color: yellow;
+			border-radius: 50%;
+
+			text-align: center;
+			display: flex;
+		    justify-content: center;
+		    align-content: center;
+		    flex-direction: column;
+			font-family: monospace;
+		}
+
+		.button_AB {
+		    position:absolute;
+			left: 78vw;
+	        top: 30vw;
+			width: 18vw;
+			height: 18vw;
+			box-sizing: border-box;
 			border-radius: 50%;
 
 			text-align: center;
@@ -98,7 +113,6 @@
 			width: 10vw;
 			padding: 2%;
 			box-sizing: border-box;
-			background-color: yellow;
 			align-items: center;
 			justify-content: center;
 		}
@@ -110,7 +124,6 @@
 			width: 10vw;
 			padding: 2vw;
 			box-sizing: border-box;
-			background-color: yellow;
 			align-items: center;
 			justify-content: center;
 		}
@@ -123,6 +136,19 @@
 			padding: 2vw;
 			box-sizing: border-box;
 			background-color: green;
+			border: 3px;
+			border-style: outset;
+		}
+
+		.loadROMButton {
+		    position:absolute;
+			left: 45vw;
+		    top: 43vw;
+			width: 10vw;
+			padding: 2vw;
+			box-sizing: border-box;
+			background-color: green;
+			border-style: outset;
 		}
 
 		.grid3x3 {
@@ -158,21 +184,25 @@
 	<div id="CONTROLLER" class="controls">
 		<div id="DPAD" class="dpad">
 			<div class="grid3x3">
-			    <div id="DIAG_UL" class="box"></div>
+			    <div id="MULTI_UL" class="box"></div>
 			    <div id="BUTTON_UP" class="box"></div>
-			    <div id="DIAG_UR" class="box"></div>
+			    <div id="MULTI_UR" class="box"></div>
 			    <div id="BUTTON_LEFT" class="box"></div>
 			    <div id="deadzone" class="box"></div>
 			    <div id="BUTTON_RIGHT" class="box"></div>
-			    <div id="DIAG_DL" class="box"></div>
+			    <div id="MULTI_DL" class="box"></div>
 			    <div id="BUTTON_DOWN" class="box"></div>
-			    <div id="DIAG_DR" class="box"></div>
+			    <div id="MULTI_DR" class="box"></div>
 			</div>
 		</div>
+		<div id="MULTI_AB" class="button_AB"></div>
 		<div id="BUTTON_B" class="button_B"></div>
 		<div id="BUTTON_A" class="button_A"></div>
 		<div id="BUTTON_SELECT" class="button_SELECT"></div>
 		<div id="BUTTON_START" class="button_START"></div>
+		<!-- <div id="loadROM" class="loadROMButton">
+			<input type="file" id="upload" style="display:none"/>
+		</div> -->
 		<div id="toggleFullScreen" class="fullscreenButton"></div>
 	</div>
 </body></html>

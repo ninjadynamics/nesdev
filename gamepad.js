@@ -2,11 +2,12 @@
 // sliding their finger from one button to another
 var childButton = {};
 
-const diagonals = {
+const multipress = {
     "UR": ["BUTTON_UP",   "BUTTON_RIGHT"],
     "DR": ["BUTTON_DOWN", "BUTTON_RIGHT"],
     "UL": ["BUTTON_UP",   "BUTTON_LEFT" ],
-    "DL": ["BUTTON_DOWN", "BUTTON_LEFT" ]
+    "DL": ["BUTTON_DOWN", "BUTTON_LEFT" ],
+    "AB": ["BUTTON_A",    "BUTTON_B"    ]
 };
 
 function isButtonDown(eventType) {
@@ -57,10 +58,11 @@ function buttonPress(event) {
                 $(lastButton).css("border-style", "outset");
                 console.log("Released", lastButton.id); // Debug
 			}
-            else if (lastButton.id.startsWith("DIAG")) {
-                // Get buttons of diagonal
+            // Otherwise, if it was a multipress
+            else if (lastButton.id.startsWith("MULTI")) {
+                // Get buttons
                 let key = lastButton.id.split("_").pop();
-                for (const d of diagonals[key]) {
+                for (const d of multipress[key]) {
                     nes.buttonUp(1, eval("jsnes.Controller." + d));
                 }
                 $(lastButton).css("background-color", "transparent");
@@ -79,8 +81,7 @@ function buttonPress(event) {
             // Send that button interaction to the emulator
 			fn(1, eval("jsnes.Controller." + element.id));
 
-			// Show button presses / releases for the
-			// current button the user is interacting with
+			// Show button presses / releases
 			if (isButtonDown(eventType)) {
                 $(element).css("border-style", "inset");
                 console.log("Pressed", element.id); // Debug
@@ -90,20 +91,19 @@ function buttonPress(event) {
                 console.log("Released", element.id);  // Debug
 			}
 		}
-        // Otherwise, if it's a diagonal on the dpad
-        else if (element.id.startsWith("DIAG")) {
+        // Otherwise, if it's actually two buttons at the same time
+        else if (element.id.startsWith("MULTI")) {
 
             // Get the correct function call
             let fn = fnNesButtonPress(eventType)
 
-            // Get buttons of diagonal
+            // Get buttons
             let key = element.id.split("_").pop();
-            for (const d of diagonals[key]) {
+            for (const d of multipress[key]) {
                 fn(1, eval("jsnes.Controller." + d));
             }
 
-            // Show button presses / releases for the
-			// current diagonal the user is interacting with
+            // Show button presses / releases
             if (isButtonDown(eventType)) {
 				$(element).css("background-color", "#444");
                 console.log("Pressed", element.id); // Debug
@@ -114,6 +114,22 @@ function buttonPress(event) {
 			}
         }
 	}
+}
+
+function uploadROM(event) {
+    $('#upload').trigger('click');
+
+    const inputElement = document.getElementById("upload");
+    inputElement.addEventListener("change", handleFiles, false);
+
+    function handleFiles() {
+        let f = document.getElementById('upload').files[0];
+        var reader = new FileReader();
+        reader.onload = function () {
+            nes.loadROM(reader.result);
+        }
+      reader.readAsBinaryString(f);
+    }
 }
 
 // Only works for Android devices

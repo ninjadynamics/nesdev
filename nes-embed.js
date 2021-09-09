@@ -378,6 +378,7 @@ $(document).ready(function() {
 	resize();
 	isIOSDevice() && $("#toggleFullScreen").hide();
 	document.getElementById("toggleFullScreen").ontouchend = toggleFullScreen;
+	//document.getElementById("loadROM").ontouchend = uploadROM;
 	document.getElementById("CONTROLLER").ontouchstart = buttonPress;
 	document.getElementById("CONTROLLER").ontouchmove = buttonPress;
 	document.getElementById("CONTROLLER").ontouchend = buttonPress;
