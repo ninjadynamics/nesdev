@@ -116,7 +116,23 @@ function buttonPress(event) {
 	}
 }
 
+function analogSwitch(event) {
+    event.preventDefault();
+    if (event.type == "touchstart") {
+        $("#analogSwitch").css("border-style", "inset");
+        return;
+    }
+    $("#analogSwitch").css("border-style", "outset");
+    // ...
+}
+
 function uploadROM(event) {
+    event.preventDefault();
+    if (event.type == "touchstart") {
+        $("#loadROM").css("border-style", "inset");
+        return;
+    }
+    $("#loadROM").css("border-style", "outset");
     $('#upload').trigger('click');
 
     const inputElement = document.getElementById("upload");
@@ -134,6 +150,7 @@ function uploadROM(event) {
 
 // Only works for Android devices
 function toggleFullScreen(event) {
+    event.preventDefault();
 	let element = document.querySelector("#all");
 	if (
 		!document.fullscreenElement &&

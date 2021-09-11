@@ -109,7 +109,7 @@
 		.button_SELECT {
 		    position:absolute;
 			left: 45vw;
-		    top: 24vw;
+		    top: 22vw;
 			width: 10vw;
 			padding: 2%;
 			box-sizing: border-box;
@@ -120,7 +120,7 @@
 		.button_START {
 		    position:absolute;
 			left: 45vw;
-		    top: 33vw;
+		    top: 31vw;
 			width: 10vw;
 			padding: 2vw;
 			box-sizing: border-box;
@@ -128,27 +128,29 @@
 			justify-content: center;
 		}
 
-		.fullscreenButton {
-		    position:absolute;
+		.analogSwitchButton {
+			position:absolute;
 			left: 45vw;
-		    top: 3vw;
+		    top: 12vw;
 			width: 10vw;
 			padding: 2vw;
 			box-sizing: border-box;
-			background-color: green;
+			background-color: #666;
 			border: 3px;
 			border-style: outset;
+			border-radius: 20%;
 		}
 
 		.loadROMButton {
 		    position:absolute;
 			left: 45vw;
-		    top: 43vw;
+		    top: 41.4vw;
 			width: 10vw;
 			padding: 2vw;
 			box-sizing: border-box;
-			background-color: green;
+			background-color: #666;
 			border-style: outset;
+			border-radius: 20%;
 		}
 
 		.grid3x3 {
@@ -169,7 +171,7 @@
 		}
 
 		[id^="BUTTON"] {
-			background: #BBB;
+			background: #999;
 			border: 3px;
 			border-style: outset;
 		}
@@ -195,15 +197,17 @@
 			    <div id="MULTI_DR" class="box"></div>
 			</div>
 		</div>
+		<!-- <div id="ANALOG" class="dpad">
+		</div> -->
 		<div id="MULTI_AB" class="button_AB"></div>
 		<div id="BUTTON_B" class="button_B"></div>
 		<div id="BUTTON_A" class="button_A"></div>
 		<div id="BUTTON_SELECT" class="button_SELECT"></div>
 		<div id="BUTTON_START" class="button_START"></div>
+		<div id="analogSwitch" class="analogSwitchButton"></div>
 		<div id="loadROM" class="loadROMButton">
 			<input type="file" id="upload" style="display:none"/>
 		</div>
-		<div id="toggleFullScreen" class="fullscreenButton"></div>
 	</div>
 </body></html>
 

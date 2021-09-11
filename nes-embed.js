@@ -359,17 +359,6 @@ function resize() {
 		$(".controls").hide();
 		console.log("Desktop mode");
 	}
-
-	if (
-		!document.fullscreenElement &&
-		!document.mozFullScreenElement &&
-		!document.webkitFullscreenElement
-	) {
-	  $("#toggleFullScreen").css("background-color", "green");
-	}
-	else {
-	  $("#toggleFullScreen").css("background-color", "red");
-	}
 }
 
 function isIOSDevice(){
@@ -379,8 +368,14 @@ function isIOSDevice(){
 $(document).ready(function() {
 	resize();
 	isIOSDevice() && $("#toggleFullScreen").hide();
-	document.getElementById("toggleFullScreen").ontouchend = toggleFullScreen;
+	document.getElementById("nes-canvas").ontouchend = toggleFullScreen;
+
+	document.getElementById("loadROM").ontouchstart = uploadROM;
 	document.getElementById("loadROM").ontouchend = uploadROM;
+
+	document.getElementById("analogSwitch").ontouchstart = analogSwitch;
+	document.getElementById("analogSwitch").ontouchend = analogSwitch;
+
 	document.getElementById("CONTROLLER").ontouchstart = buttonPress;
 	document.getElementById("CONTROLLER").ontouchmove = buttonPress;
 	document.getElementById("CONTROLLER").ontouchend = buttonPress;
