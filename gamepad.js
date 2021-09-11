@@ -144,7 +144,7 @@ function uploadROM(event) {
         reader.onload = function () {
             nes.loadROM(reader.result);
         }
-      reader.readAsBinaryString(f);
+        reader.readAsBinaryString(f);
     }
 }
 
