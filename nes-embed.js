@@ -15,6 +15,8 @@ var audio_write_cursor = 0, audio_read_cursor = 0;
 const BUTTON_A = 0;
 const BUTTON_B = 2;
 
+var emulationPaused = false;
+
 var nes = new jsnes.NES({
 	onFrame: function(framebuffer_24){
 		for(var i = 0; i < FRAMEBUFFER_SIZE; i++) framebuffer_u32[i] = 0xFF000000 | framebuffer_24[i];
@@ -43,7 +45,7 @@ function onAnimationFrame(){
 
 	image.data.set(framebuffer_u8);
 	canvas_ctx.putImageData(image, 0, 0);
-	nes.frame();
+	if (!emulationPaused) nes.frame();
 }
 
 function audio_remain(){
@@ -51,7 +53,7 @@ function audio_remain(){
 }
 
 function audio_callback(event) {
-	if (nes.rom == null) return;
+	if (nes.rom == null || emulationPaused) return;
 
 	var dst = event.outputBuffer;
 	var len = dst.length;
@@ -378,7 +380,7 @@ $(document).ready(function() {
 	resize();
 	isIOSDevice() && $("#toggleFullScreen").hide();
 	document.getElementById("toggleFullScreen").ontouchend = toggleFullScreen;
-	//document.getElementById("loadROM").ontouchend = uploadROM;
+	document.getElementById("loadROM").ontouchend = uploadROM;
 	document.getElementById("CONTROLLER").ontouchstart = buttonPress;
 	document.getElementById("CONTROLLER").ontouchmove = buttonPress;
 	document.getElementById("CONTROLLER").ontouchend = buttonPress;
