@@ -1,19 +1,23 @@
-var SCREEN_WIDTH = 256;
-var SCREEN_HEIGHT = 240;
-var FRAMEBUFFER_SIZE = SCREEN_WIDTH*SCREEN_HEIGHT;
+const BUTTON_A = 0;
+const BUTTON_B = 2;
+
+const SCREEN_WIDTH = 256;
+const SCREEN_HEIGHT = 240;
+const FRAMEBUFFER_SIZE = SCREEN_WIDTH*SCREEN_HEIGHT;
+
+const AUDIO_BUFFERING = 512;
+const SAMPLE_COUNT = 4*1024;
+const SAMPLE_MASK = SAMPLE_COUNT - 1;
+
+const TOUCH_EVENTS = "start move end";
 
 var canvas_ctx, image;
 var framebuffer_u8, framebuffer_u32;
 
-var AUDIO_BUFFERING = 512;
-var SAMPLE_COUNT = 4*1024;
-var SAMPLE_MASK = SAMPLE_COUNT - 1;
 var audio_samples_L = new Float32Array(SAMPLE_COUNT);
 var audio_samples_R = new Float32Array(SAMPLE_COUNT);
 var audio_write_cursor = 0, audio_read_cursor = 0;
 
-const BUTTON_A = 0;
-const BUTTON_B = 2;
 
 var emulationPaused = false;
 
@@ -349,6 +353,7 @@ function resize() {
 		$(".nes-div").width("100%");
 		let newWidth = $(".nes-div").width();
 		$(".nes-div").height(240 * (newWidth / 256));
+		$(".controls").height(h - $(".nes-div").height());
 		$(".controls").show();
 		console.log("Mobile mode");
 	}
@@ -361,23 +366,33 @@ function resize() {
 	}
 }
 
+function preventDefault(event) {
+	event.preventDefault();
+}
+
+function assign(fn, elementName, ...touchEvents) {
+	// Prevent default on all events
+	let element = document.getElementById(elementName);
+	for (const e of TOUCH_EVENTS.split(' ')) {
+		eval("element.ontouch" + e + " = preventDefault");
+	}
+	// Assign function call to events
+	for (const e of touchEvents) {
+		eval("element.ontouch" + e + " = fn");
+	}
+}
+
 function isIOSDevice(){
    return !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
 }
 
 $(document).ready(function() {
 	resize();
-	isIOSDevice() && $("#toggleFullScreen").hide();
-	document.getElementById("nes-canvas").ontouchend = toggleFullScreen;
 
-	document.getElementById("loadROM").ontouchstart = uploadROM;
-	document.getElementById("loadROM").ontouchend = uploadROM;
+	assign(toggleFullScreen, "nes-canvas", "end");
+	assign(uploadROM, "loadROM", "start", "end");
+	assign(analogSwitch, "analogSwitch", "start", "end");
+	assign(buttonPress, "CONTROLLER", "start", "move", "end");
 
-	document.getElementById("analogSwitch").ontouchstart = analogSwitch;
-	document.getElementById("analogSwitch").ontouchend = analogSwitch;
-
-	document.getElementById("CONTROLLER").ontouchstart = buttonPress;
-	document.getElementById("CONTROLLER").ontouchmove = buttonPress;
-	document.getElementById("CONTROLLER").ontouchend = buttonPress;
 	nes_load_url("nes-canvas", "main.nes");
 });
