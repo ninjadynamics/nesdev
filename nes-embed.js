@@ -389,11 +389,9 @@ function isIOSDevice(){
 
 $(document).ready(function() {
 	resize();
-
 	assign(toggleFullScreen, "nes-canvas", "end");
 	assign(uploadROM, "loadROM", "start", "end");
 	assign(analogSwitch, "analogSwitch", "start", "end");
 	assign(buttonPress, "CONTROLLER", "start", "move", "end");
-
 	nes_load_url("nes-canvas", "main.nes");
 });

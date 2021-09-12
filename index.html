@@ -47,6 +47,22 @@
 			width: 100%;
 		}
 
+		.analogStick {
+			position: absolute;			
+			margin: 0;
+		    top: 50%;
+		    left: 50%;
+		    -ms-transform: translate(-50%, -50%);
+		    transform: translate(-50%, -50%);
+			width: 20vw;
+			height: 20vw;
+			box-sizing: border-box;
+			border-radius: 50%;
+			background-color: #666;
+			border: 2.5vw;
+			border-style: outset;
+		}
+
 		.button_B {
 		    position:absolute;
 		    left: 60vw;
@@ -136,7 +152,7 @@
 			padding: 2vw;
 			box-sizing: border-box;
 			background-color: #666;
-			border: 3px;
+			border: 1vw;
 			border-style: outset;
 			border-radius: 20%;
 		}
@@ -172,7 +188,7 @@
 
 		[id^="BUTTON"] {
 			background: #999;
-			border: 3px;
+			border: 1vw;
 			border-style: outset;
 		}
 
@@ -197,8 +213,9 @@
 			    <div id="MULTI_DR" class="box"></div>
 			</div>
 		</div>
-		<!-- <div id="ANALOG" class="dpad">
-		</div> -->
+		<div id="ANALOG" class="dpad" style="display: none">
+			<div id="ANALOG_STICK" class="analogStick"></div>
+		</div>
 		<div id="MULTI_AB" class="button_AB"></div>
 		<div id="BUTTON_B" class="button_B"></div>
 		<div id="BUTTON_A" class="button_A"></div>

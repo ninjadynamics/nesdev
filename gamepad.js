@@ -1,13 +1,22 @@
-// This object is necessary to handle the user
-// sliding their finger from one button to another
-var childButton = {};
-
-const multipress = {
+// Handle single-touch multiple button presses
+const MULTIPRESS = {
     "UR": ["BUTTON_UP",   "BUTTON_RIGHT"],
     "DR": ["BUTTON_DOWN", "BUTTON_RIGHT"],
     "UL": ["BUTTON_UP",   "BUTTON_LEFT" ],
     "DL": ["BUTTON_DOWN", "BUTTON_LEFT" ],
     "AB": ["BUTTON_A",    "BUTTON_B"    ]
+};
+
+// This object is necessary to handle the user
+// sliding their finger from one button to another
+var childButton = {};
+
+var analog = {
+    active: false,
+    left: undefined,
+    top: undefined,
+    x: undefined,
+    y: undefined
 };
 
 function isButtonDown(eventType) {
@@ -21,13 +30,29 @@ function fnNesButtonPress(eventType) {
 	return nes.buttonUp;
 }
 
+function analogTouch(event, touch) {
+    switch (event.type) {
+        case "touchstart":
+            analog.x = (touch.clientX - analog.left) - (analog.width / 2);
+            analog.y = (touch.clientY - analog.top) - (analog.height / 2);
+            console.log(analog.x, analog.y);
+            break;
+
+        case "touchmove":
+            break;
+
+        default:
+            analogReset();
+
+    }
+}
+
 function buttonPress(event) {
 	// Prevent all the shenanigans that happen with a "long-press" on mobile
 	event.preventDefault();
 
-	// Get the source element and event type
+	// Get the source element
 	const src = event.srcElement;
-	const eventType = event.type;
 
 	// Handle the touch
 	for (const touch of event.changedTouches) {
@@ -36,12 +61,18 @@ function buttonPress(event) {
 		if (touch.target.id != src.id) continue;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+        // Handle the analog stick
+        if (src.id == "ANALOG_STICK") {
+            analogTouch(event, touch);
+            return;
+        }
+
 		// Get the element (either a button or the empty area of the gamepad)
 		// the user is physically touching right now
 		let element = $(document.elementFromPoint(touch.clientX, touch.clientY))[0];
 
 		// If it's a new touch, set the child button to its parent
-		if (eventType == "touchstart") {
+		if (event.type == "touchstart") {
 			childButton[src.id] = element;
 		}
 		// Otherwise, if the user is sliding its finger from one button to another
@@ -61,7 +92,7 @@ function buttonPress(event) {
             else if (lastButton.id.startsWith("MULTI")) {
                 // Get buttons
                 let key = lastButton.id.split("_").pop();
-                for (const d of multipress[key]) {
+                for (const d of MULTIPRESS[key]) {
                     nes.buttonUp(1, eval("jsnes.Controller." + d));
                 }
                 $(lastButton).css("background-color", "transparent");
@@ -75,13 +106,13 @@ function buttonPress(event) {
 		if (element.id.startsWith("BUTTON")) {
 
             // Get the correct function call
-			let fn = fnNesButtonPress(eventType)
+			let fn = fnNesButtonPress(event.type)
 
             // Send that button interaction to the emulator
 			fn(1, eval("jsnes.Controller." + element.id));
 
 			// Show button presses / releases
-			if (isButtonDown(eventType)) {
+			if (isButtonDown(event.type)) {
                 emulationPaused = false;
                 $(element).css("border-style", "inset");
                 console.log("Pressed", element.id); // Debug
@@ -95,16 +126,16 @@ function buttonPress(event) {
         else if (element.id.startsWith("MULTI")) {
 
             // Get the correct function call
-            let fn = fnNesButtonPress(eventType)
+            let fn = fnNesButtonPress(event.type)
 
             // Get buttons
             let key = element.id.split("_").pop();
-            for (const d of multipress[key]) {
+            for (const d of MULTIPRESS[key]) {
                 fn(1, eval("jsnes.Controller." + d));
             }
 
             // Show button presses / releases
-            if (isButtonDown(eventType)) {
+            if (isButtonDown(event.type)) {
                 emulationPaused = false;
 				$(element).css("background-color", "#444");
                 console.log("Pressed", element.id); // Debug
@@ -117,6 +148,21 @@ function buttonPress(event) {
 	}
 }
 
+function analogInit(element, parent) {
+    analog.active = true;
+    analog.x = 0;
+    analog.y = 0;
+    analog.left = parent.position().left + element.position().left;
+    analog.top = parent.position().top + element.position().top;
+    analog.width = element.width();
+    analog.height = element.height();
+}
+
+function analogReset() {
+    analog.x = 0;
+    analog.y = 0;
+}
+
 function analogSwitch(event) {
     event.preventDefault();
     if (event.type == "touchstart") {
@@ -124,7 +170,17 @@ function analogSwitch(event) {
         return;
     }
     $("#analogSwitch").css("border-style", "outset");
-    // ...
+
+    let d = $("#DPAD");
+    let a = $("#ANALOG");
+    let c = $("#CONTROLLER");
+    if (a.css("display") == "none") {
+        a.show(); d.hide();
+        analogInit(a, c);
+        return;
+    }
+    analogReset();
+    a.hide(); d.show();
 }
 
 function uploadROM(event) {
