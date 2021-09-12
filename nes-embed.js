@@ -103,7 +103,8 @@ function keyboard(callback, event) {
 			callback(player, jsnes.Controller.BUTTON_SELECT); break;
 		case 13: // Return
 			callback(player, jsnes.Controller.BUTTON_START); break;
-		default: prevent = false; break;
+		default:
+			prevent = false; break;
 	}
 
 	if (prevent){
@@ -129,7 +130,7 @@ function nes_init(canvas_id){
 	var script_processor = audio_ctx.createScriptProcessor(AUDIO_BUFFERING, 0, 2);
 	script_processor.onaudioprocess = audio_callback;
 	script_processor.connect(audio_ctx.destination);
-	document.addEventListener('click',  () => {audio_ctx.resume()})
+	document.addEventListener('touchstart',  () => {audio_ctx.resume()});
 }
 
 function nes_boot(rom_data){

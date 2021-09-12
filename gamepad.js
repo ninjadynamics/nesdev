@@ -24,7 +24,6 @@ function fnNesButtonPress(eventType) {
 function buttonPress(event) {
 	// Prevent all the shenanigans that happen with a "long-press" on mobile
 	event.preventDefault();
-    event.stopPropagation();
 
 	// Get the source element and event type
 	const src = event.srcElement;
@@ -83,6 +82,7 @@ function buttonPress(event) {
 
 			// Show button presses / releases
 			if (isButtonDown(eventType)) {
+                emulationPaused = false;
                 $(element).css("border-style", "inset");
                 console.log("Pressed", element.id); // Debug
 			}
@@ -105,6 +105,7 @@ function buttonPress(event) {
 
             // Show button presses / releases
             if (isButtonDown(eventType)) {
+                emulationPaused = false;
 				$(element).css("background-color", "#444");
                 console.log("Pressed", element.id); // Debug
 			}
@@ -128,6 +129,7 @@ function analogSwitch(event) {
 
 function uploadROM(event) {
     event.preventDefault();
+    emulationPaused = true;
     if (event.type == "touchstart") {
         $("#loadROM").css("border-style", "inset");
         return;
@@ -143,6 +145,7 @@ function uploadROM(event) {
         var reader = new FileReader();
         reader.onload = function () {
             nes.loadROM(reader.result);
+            emulationPaused = false;
         }
         reader.readAsBinaryString(f);
     }
