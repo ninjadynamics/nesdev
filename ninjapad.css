@@ -140,6 +140,7 @@
 	padding: 2vw;
 	box-sizing: border-box;
 	background-color: #666;
+	border: 1vw;
 	border-style: outset;
 	border-radius: 20%;
 }
