@@ -1,4 +1,5 @@
 const DEBUG = false;
+const SINGLE_ROM = false;
 
 function isIOSDevice(){
    return !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);

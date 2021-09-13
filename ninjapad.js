@@ -226,12 +226,14 @@ function analogSwitch(event) {
 
 function uploadROM(event) {
     event.preventDefault();
-    emulationPaused = true;
     if (event.type == "touchstart") {
         $("#loadROM").css("border-style", "inset");
         return;
     }
     $("#loadROM").css("border-style", "outset");
+    if (SINGLE_ROM) return;
+
+    emulationPaused = true;
     $('#upload').trigger('click');
 
     const inputElement = document.getElementById("upload");
