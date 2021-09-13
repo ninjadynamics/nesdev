@@ -18,6 +18,8 @@ const DPAD_BUTTONS = [
     ["BUTTON_DOWN", "BUTTON_LEFT" ],
 ]
 
+const DEADZONE = 1.2;
+
 // This object is necessary to handle the user
 // sliding their finger from one button to another
 var childButton = {};
@@ -88,7 +90,7 @@ function analogTouch(event, touch) {
             );
             let btnIndex = Math.floor(((180 + (45/2) + (r * 180 / Math.PI)) % 360) / 45);
             analog.padBtn && pressButtons(nes.buttonUp, analog.padBtn);
-            analog.padBtn = d < vw(2) ? null : DPAD_BUTTONS[btnIndex];
+            analog.padBtn = d < vw(DEADZONE) ? null : DPAD_BUTTONS[btnIndex];
             analog.padBtn && pressButtons(nes.buttonDown, analog.padBtn);
             break;
 
