@@ -16,6 +16,18 @@
 			background-color: black;
 		}
 
+		canvas {
+			image-rendering: optimizeSpeed;
+			image-rendering: -moz-crisp-edges;
+			image-rendering: -webkit-optimize-contrast;
+			image-rendering: -o-crisp-edges;
+			image-rendering: crisp-edges;
+			-ms-interpolation-mode: nearest-neighbor;
+			image-rendering: pixelated;
+			width: 100%;
+			height: 100%;
+		}
+
 		.nes-div {
 			width: 768px;
 			max-width: 768px;
@@ -29,31 +41,34 @@
 			margin: auto;
 		}
 
-		canvas {
-			image-rendering: optimizeSpeed;
-			image-rendering: -moz-crisp-edges;
-			image-rendering: -webkit-optimize-contrast;
-			image-rendering: -o-crisp-edges;
-			image-rendering: crisp-edges;
-			-ms-interpolation-mode: nearest-neighbor;
-			image-rendering: pixelated;
-			width: 100%;
-			height: 100%;
-		}
-
 		.controls {
 			position: relative;
 			background-color: #222;
 			width: 100%;
 		}
 
+		.dpad {
+		    position: absolute;
+		    left: 4vw;
+		    top: 12vw;
+			width: 35vw;
+			height: 35vw;
+			display: flex;
+		    justify-content: center;
+		    align-items: center
+		}
+
+		.grid3x3 {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			display: grid;
+			grid-template-columns: 1fr 1fr 1fr;
+		    grid-template-rows: 1fr 1fr 1fr;
+		}
+
 		.analogStick {
-			position: absolute;			
-			margin: 0;
-		    top: 50%;
-		    left: 50%;
-		    -ms-transform: translate(-50%, -50%);
-		    transform: translate(-50%, -50%);
+			position: absolute;
 			width: 20vw;
 			height: 20vw;
 			box-sizing: border-box;
@@ -63,8 +78,19 @@
 			border-style: outset;
 		}
 
+		.analogRing {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			box-sizing: border-box;
+			border-radius: 50%;
+			background-color: transparent;
+			border: 2.5vw;
+			border-style: inset;
+		}
+
 		.button_B {
-		    position:absolute;
+		    position: absolute;
 		    left: 60vw;
 		    top: 22vw;
 			width: 18vw;
@@ -81,7 +107,7 @@
 		}
 
 		.button_A {
-		    position:absolute;
+		    position: absolute;
 			left: 78vw;
 	        top: 10vw;
 			width: 18vw;
@@ -98,7 +124,7 @@
 		}
 
 		.button_AB {
-		    position:absolute;
+		    position: absolute;
 			left: 78vw;
 	        top: 30vw;
 			width: 18vw;
@@ -114,16 +140,8 @@
 			font-family: monospace;
 		}
 
-		.dpad {
-		    position:absolute;
-		    left: 4vw;
-		    top: 12vw;
-			width: 35vw;
-			height: 35vw;
-		}
-
 		.button_SELECT {
-		    position:absolute;
+		    position: absolute;
 			left: 45vw;
 		    top: 22vw;
 			width: 10vw;
@@ -134,7 +152,7 @@
 		}
 
 		.button_START {
-		    position:absolute;
+		    position: absolute;
 			left: 45vw;
 		    top: 31vw;
 			width: 10vw;
@@ -145,7 +163,7 @@
 		}
 
 		.analogSwitchButton {
-			position:absolute;
+			position: absolute;
 			left: 45vw;
 		    top: 12vw;
 			width: 10vw;
@@ -158,7 +176,7 @@
 		}
 
 		.loadROMButton {
-		    position:absolute;
+		    position: absolute;
 			left: 45vw;
 		    top: 41.4vw;
 			width: 10vw;
@@ -167,17 +185,6 @@
 			background-color: #666;
 			border-style: outset;
 			border-radius: 20%;
-		}
-
-		.grid3x3 {
-			position: absolute;
-			left: 0%;
-			top: 0%;
-			width: 100%;
-			height: 100%;
-			display: grid;
-			grid-template-columns: 1fr 1fr 1fr;
-		    grid-template-rows: 1fr 1fr 1fr;
 		}
 
 		.box {
@@ -214,6 +221,7 @@
 			</div>
 		</div>
 		<div id="ANALOG" class="dpad" style="display: none">
+			<div id="ring" class="analogRing"></div>
 			<div id="ANALOG_STICK" class="analogStick"></div>
 		</div>
 		<div id="MULTI_AB" class="button_AB"></div>

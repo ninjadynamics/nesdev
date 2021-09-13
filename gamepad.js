@@ -13,10 +13,11 @@ var childButton = {};
 
 var analog = {
     active: false,
-    left: undefined,
-    top: undefined,
-    x: undefined,
-    y: undefined
+    touchX: undefined,
+    touchY: undefined,
+    deltaX: undefined,
+    deltaY: undefined,
+    padBtn: undefined
 };
 
 function isButtonDown(eventType) {
@@ -30,19 +31,51 @@ function fnNesButtonPress(eventType) {
 	return nes.buttonUp;
 }
 
+function vw(v) {
+  let w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+  return (v * w) / 100;
+}
+
+function dist(dx, dy) {
+    return Math.sqrt((dx * dx) + (dy * dy));
+}
+
+function angle(dx, dy) {
+    return Math.atan2(dy, dx);
+}
+
+function analogReset(element) {
+    element.css("transform", "translate(0, 0)");
+}
+
 function analogTouch(event, touch) {
+    let a = $("#ANALOG_STICK");
     switch (event.type) {
         case "touchstart":
-            analog.x = (touch.clientX - analog.left) - (analog.width / 2);
-            analog.y = (touch.clientY - analog.top) - (analog.height / 2);
-            console.log(analog.x, analog.y);
+            analog.touchX = touch.clientX;
+            analog.touchY = touch.clientY;
             break;
 
         case "touchmove":
+            analog.deltaX = touch.clientX - analog.touchX;
+            analog.deltaY = touch.clientY - analog.touchY;
+
+            let r = angle(analog.deltaX, analog.deltaY);
+            let d = Math.min(vw(10), dist(analog.deltaX, analog.deltaY));
+
+            let dx = Math.cos(r) * d;
+            let dy = Math.sin(r) * d;
+            a.css(
+                "transform",
+                "translate(" + dx + "px, " + dy + "px)"
+            );
+            analog.padBtn = d < vw(2) ?
+                -1 : Math.floor((180 + (r * 180 / Math.PI)) / 45);
+            console.log(analog.padBtn);
             break;
 
         default:
-            analogReset();
+            analogReset(a);
 
     }
 }
@@ -148,21 +181,6 @@ function buttonPress(event) {
 	}
 }
 
-function analogInit(element, parent) {
-    analog.active = true;
-    analog.x = 0;
-    analog.y = 0;
-    analog.left = parent.position().left + element.position().left;
-    analog.top = parent.position().top + element.position().top;
-    analog.width = element.width();
-    analog.height = element.height();
-}
-
-function analogReset() {
-    analog.x = 0;
-    analog.y = 0;
-}
-
 function analogSwitch(event) {
     event.preventDefault();
     if (event.type == "touchstart") {
@@ -173,13 +191,13 @@ function analogSwitch(event) {
 
     let d = $("#DPAD");
     let a = $("#ANALOG");
-    let c = $("#CONTROLLER");
     if (a.css("display") == "none") {
+        analog.active = true;
         a.show(); d.hide();
-        analogInit(a, c);
+        analogReset(a);
         return;
     }
-    analogReset();
+    analog.active = false;
     a.hide(); d.show();
 }
 
