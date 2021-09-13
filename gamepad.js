@@ -7,6 +7,17 @@ const MULTIPRESS = {
     "AB": ["BUTTON_A",    "BUTTON_B"    ]
 };
 
+const DPAD_BUTTONS = [
+    ["BUTTON_LEFT"                ],
+    ["BUTTON_UP",   "BUTTON_LEFT" ],
+    ["BUTTON_UP",                 ],
+    ["BUTTON_UP",   "BUTTON_RIGHT"],
+    ["BUTTON_RIGHT"               ],
+    ["BUTTON_DOWN", "BUTTON_RIGHT"],
+    ["BUTTON_DOWN"                ],
+    ["BUTTON_DOWN", "BUTTON_LEFT" ],
+]
+
 // This object is necessary to handle the user
 // sliding their finger from one button to another
 var childButton = {};
@@ -44,6 +55,12 @@ function angle(dx, dy) {
     return Math.atan2(dy, dx);
 }
 
+function pressButtons(fn, buttons) {
+    for (const b of buttons) {
+        fn(1, eval("jsnes.Controller." + b));
+    }
+}
+
 function analogReset(element) {
     element.css("transform", "translate(0, 0)");
 }
@@ -69,12 +86,14 @@ function analogTouch(event, touch) {
                 "transform",
                 "translate(" + dx + "px, " + dy + "px)"
             );
-            analog.padBtn = d < vw(2) ?
-                -1 : Math.floor((180 + (r * 180 / Math.PI)) / 45);
-            console.log(analog.padBtn);
+            let btnIndex = Math.floor(((180 + (45/2) + (r * 180 / Math.PI)) % 360) / 45);
+            analog.padBtn && pressButtons(nes.buttonUp, analog.padBtn);
+            analog.padBtn = d < vw(2) ? null : DPAD_BUTTONS[btnIndex];
+            analog.padBtn && pressButtons(nes.buttonDown, analog.padBtn);
             break;
 
         default:
+            analog.padBtn && pressButtons(nes.buttonUp, analog.padBtn);
             analogReset(a);
 
     }
