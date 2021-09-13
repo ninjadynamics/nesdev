@@ -5,10 +5,11 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<script src="https://unpkg.com/image-map-resizer@1.0.10/js/imageMapResizer.min.js"></script>
 	<script src="https://unpkg.com/jsnes/dist/jsnes.min.js"></script>
-	<script src="gamepad.js"></script>
+	<script src="ninjapad.js"></script>
 	<script src="nes-embed.js"></script>
+	<!-- <script>$(function(){ $("#gamepad").load("gamepad.html") });</script> -->
 </head>
-<body id="all">
+<body>
 	<style>
 		body {
 			margin: 0;
@@ -28,7 +29,7 @@
 			height: 100%;
 		}
 
-		.nes-div {
+		.game {
 			width: 768px;
 			max-width: 768px;
 			height: 720px;
@@ -40,220 +41,9 @@
 			bottom: 0;
 			margin: auto;
 		}
-
-		.controls {
-			position: relative;
-			background-color: #222;
-			width: 100%;
-		}
-
-		.dpad {
-		    position: absolute;
-		    left: 4vw;
-		    top: 12vw;
-			width: 35vw;
-			height: 35vw;
-			display: flex;
-		    justify-content: center;
-		    align-items: center
-		}
-
-		.grid3x3 {
-			position: absolute;
-			width: 100%;
-			height: 100%;
-			display: grid;
-			grid-template-columns: 1fr 1fr 1fr;
-		    grid-template-rows: 1fr 1fr 1fr;
-		}
-
-		.analogStick {
-			position: absolute;
-			width: 20vw;
-			height: 20vw;
-			box-sizing: border-box;
-			border-radius: 50%;
-			background-color: #666;
-			border: 2.5vw;
-			border-style: outset;
-		}
-
-		.analogRing {
-			position: absolute;
-			width: 100%;
-			height: 100%;
-			box-sizing: border-box;
-			border-radius: 50%;
-			background-color: transparent;
-			border: 2.5vw;
-			border-style: inset;
-		}
-
-		.button_B {
-		    position: absolute;
-		    left: 60vw;
-		    top: 22vw;
-			width: 18vw;
-			height: 18vw;
-			box-sizing: border-box;
-			border-radius: 50%;
-
-			text-align: center;
-			display: flex;
-		    justify-content: center;
-		    align-content: center;
-		    flex-direction: column;
-			font-family: monospace;
-		}
-
-		.button_A {
-		    position: absolute;
-			left: 78vw;
-	        top: 10vw;
-			width: 18vw;
-			height: 18vw;
-			box-sizing: border-box;
-			border-radius: 50%;
-
-			text-align: center;
-			display: flex;
-		    justify-content: center;
-		    align-content: center;
-		    flex-direction: column;
-			font-family: monospace;
-		}
-
-		.button_AB {
-		    position: absolute;
-			left: 78vw;
-	        top: 30vw;
-			width: 18vw;
-			height: 18vw;
-			box-sizing: border-box;
-			border-radius: 50%;
-
-			text-align: center;
-			display: flex;
-		    justify-content: center;
-		    align-content: center;
-		    flex-direction: column;
-			font-family: monospace;
-		}
-
-		.button_SELECT {
-		    position: absolute;
-			left: 45vw;
-		    top: 22vw;
-			width: 10vw;
-			padding: 2%;
-			box-sizing: border-box;
-			align-items: center;
-			justify-content: center;
-		}
-
-		.button_START {
-		    position: absolute;
-			left: 45vw;
-		    top: 31vw;
-			width: 10vw;
-			padding: 2vw;
-			box-sizing: border-box;
-			align-items: center;
-			justify-content: center;
-		}
-
-		.analogSwitchButton {
-			position: absolute;
-			left: 45vw;
-		    top: 12vw;
-			width: 10vw;
-			padding: 2vw;
-			box-sizing: border-box;
-			background-color: #666;
-			border: 1vw;
-			border-style: outset;
-			border-radius: 20%;
-		}
-
-		.loadROMButton {
-		    position: absolute;
-			left: 45vw;
-		    top: 41.4vw;
-			width: 10vw;
-			padding: 2vw;
-			box-sizing: border-box;
-			background-color: #666;
-			border-style: outset;
-			border-radius: 20%;
-		}
-
-		.box {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-		}
-
-		[id^="BUTTON"] {
-			background: #999;
-			border: 1vw;
-			border-style: outset;
-		}
-
-		#deadzone {
-			background: #444;
-		}
 	</style>
-	<div class="nes-div">
+	<div id="gameScreen" class="game">
 		<canvas id="nes-canvas" width="256" height="240"></canvas>
 	</div>
-	<div id="CONTROLLER" class="controls">
-		<div id="DPAD" class="dpad">
-			<div class="grid3x3">
-			    <div id="MULTI_UL" class="box"></div>
-			    <div id="BUTTON_UP" class="box"></div>
-			    <div id="MULTI_UR" class="box"></div>
-			    <div id="BUTTON_LEFT" class="box"></div>
-			    <div id="deadzone" class="box"></div>
-			    <div id="BUTTON_RIGHT" class="box"></div>
-			    <div id="MULTI_DL" class="box"></div>
-			    <div id="BUTTON_DOWN" class="box"></div>
-			    <div id="MULTI_DR" class="box"></div>
-			</div>
-		</div>
-		<div id="ANALOG" class="dpad" style="display: none">
-			<div id="ring" class="analogRing"></div>
-			<div id="ANALOG_STICK" class="analogStick"></div>
-		</div>
-		<div id="MULTI_AB" class="button_AB"></div>
-		<div id="BUTTON_B" class="button_B"></div>
-		<div id="BUTTON_A" class="button_A"></div>
-		<div id="BUTTON_SELECT" class="button_SELECT"></div>
-		<div id="BUTTON_START" class="button_START"></div>
-		<div id="analogSwitch" class="analogSwitchButton"></div>
-		<div id="loadROM" class="loadROMButton">
-			<input type="file" id="upload" style="display:none"/>
-		</div>
-	</div>
+	<div id="ninjapad"></div>
 </body></html>
-
-
-<!--
-<!DOCTYPE html>
-
-<html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<title>Embedding Example</title>
-
-		<script type="text/javascript" src="https://unpkg.com/jsnes/dist/jsnes.min.js"></script>
-		<script type="text/javascript" src="nes-embed.js"></script>
-		<script>window.onload = function(){nes_load_url("nes-canvas", "from_below_2020_07_11.nes");}</script>
-	</head>
-	<body>
-		<div style="width:512px">
-			<canvas id="nes-canvas" width="256" height="240" style="width:100%"/>
-		</div>
-		<p>DPad: Arrow keys<br/>Start: Return, Select: Tab<br/>A Button: A, B Button: S</p>
-	</body>
-</html>
--->

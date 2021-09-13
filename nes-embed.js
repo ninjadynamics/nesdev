@@ -351,35 +351,19 @@ function resize() {
   	let w = window.screen.availWidth
   	if (h > w) {
 		console.log("Show touch controls");
-		$(".nes-div").width("100%");
-		let newWidth = $(".nes-div").width();
-		$(".nes-div").height(240 * (newWidth / 256));
-		$(".controls").height(h - $(".nes-div").height());
-		$(".controls").show();
+		$(".game").width("100%");
+		let newWidth = $(".game").width();
+		$(".game").height(240 * (newWidth / 256));
+		$(".ninjapad").height(h - $(".game").height());
+		$(".ninjapad").show();
 		console.log("Mobile mode");
 	}
 	else {
-		$(".nes-div").height("100%");
-		let newHeight = $(".nes-div").height();
-		$(".nes-div").width(256 * (newHeight / 240));
-		$(".controls").hide();
+		$(".game").height("100%");
+		let newHeight = $(".game").height();
+		$(".game").width(256 * (newHeight / 240));
+		$(".ninjapad").hide();
 		console.log("Desktop mode");
-	}
-}
-
-function preventDefault(event) {
-	event.preventDefault();
-}
-
-function assign(fn, elementName, ...touchEvents) {
-	// Prevent default on all events
-	let element = document.getElementById(elementName);
-	for (const e of TOUCH_EVENTS.split(' ')) {
-		eval("element.ontouch" + e + " = preventDefault");
-	}
-	// Assign function call to events
-	for (const e of touchEvents) {
-		eval("element.ontouch" + e + " = fn");
 	}
 }
 
@@ -389,9 +373,6 @@ function isIOSDevice(){
 
 $(document).ready(function() {
 	resize();
-	assign(toggleFullScreen, "nes-canvas", "end");
-	assign(uploadROM, "loadROM", "start", "end");
-	assign(analogSwitch, "analogSwitch", "start", "end");
-	assign(buttonPress, "CONTROLLER", "start", "move", "end");
+	loadNinjaPad("gameScreen");
 	nes_load_url("nes-canvas", "main.nes");
 });

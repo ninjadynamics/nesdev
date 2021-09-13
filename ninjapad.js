@@ -249,7 +249,8 @@ function uploadROM(event) {
 // Only works for Android devices
 function toggleFullScreen(event) {
     event.preventDefault();
-	let element = document.querySelector("#all");
+    emulationPaused = false;
+	let element = document.body;
 	if (
 		!document.fullscreenElement &&
    		!document.mozFullScreenElement &&
@@ -278,4 +279,31 @@ function toggleFullScreen(event) {
 			document.msExitFullscreen();
 		}
   	}
+}
+
+function preventDefault(event) {
+	event.preventDefault();
+}
+
+function assign(fn, elementName, ...touchEvents) {
+	// Prevent default on all events
+	let element = document.getElementById(elementName);
+	for (const e of TOUCH_EVENTS.split(' ')) {
+		eval("element.ontouch" + e + " = preventDefault");
+	}
+	// Assign function call to events
+	for (const e of touchEvents) {
+		eval("element.ontouch" + e + " = fn");
+	}
+}
+function loadNinjaPad(gameScreen) {
+    $("#ninjapad").load(
+		"ninjapad.html",
+		function() {
+			assign(toggleFullScreen, gameScreen, "end");
+			assign(uploadROM, "loadROM", "start", "end");
+			assign(analogSwitch, "analogSwitch", "start", "end");
+			assign(buttonPress, "CONTROLLER", "start", "move", "end");
+		}
+	);
 }
