@@ -1,49 +1,49 @@
 <html><head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>NES Platformer Engine - WIP</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NES Platformer Engine - WIP</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-	<script src="https://unpkg.com/image-map-resizer@1.0.10/js/imageMapResizer.min.js"></script>
-	<script src="https://unpkg.com/jsnes/dist/jsnes.min.js"></script>
-	<script src="ninjapad.js"></script>
-	<script src="nes-embed.js"></script>
-	<script src="main.js"></script>
+    <script src="https://unpkg.com/image-map-resizer@1.0.10/js/imageMapResizer.min.js"></script>
+    <script src="https://unpkg.com/jsnes/dist/jsnes.min.js"></script>
+    <script src="ninjapad.js"></script>
+    <script src="nes-embed.js"></script>
+    <script src="main.js"></script>
 </head>
 <body>
-	<style>
-		body {
-			margin: 0;
-			padding: 0;
-			background-color: black;
-		}
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #222;
+        }
 
-		canvas {
-			image-rendering: optimizeSpeed;
-			image-rendering: -moz-crisp-edges;
-			image-rendering: -webkit-optimize-contrast;
-			image-rendering: -o-crisp-edges;
-			image-rendering: crisp-edges;
-			-ms-interpolation-mode: nearest-neighbor;
-			image-rendering: pixelated;
-			width: 100%;
-			height: 100%;
-		}
+        canvas {
+            image-rendering: optimizeSpeed;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: -o-crisp-edges;
+            image-rendering: crisp-edges;
+            -ms-interpolation-mode: nearest-neighbor;
+            image-rendering: pixelated;
+            width: 100%;
+            height: 100%;
+        }
 
-		.game {
-			width: 768px;
-			max-width: 768px;
-			height: 720px;
-			max-height: 720px;
-			position: relative;
-			left: 0;
-			right: 0;
-			top: 0;
-			bottom: 0;
-			margin: auto;
-		}
-	</style>
-	<div id="gameScreen" class="game">
-		<canvas id="nes-canvas" width="256" height="240"></canvas>
-	</div>
-	<div id="ninjapad"></div>
+        .game {
+            width: 768px;
+            max-width: 768px;
+            height: 720px;
+            max-height: 720px;
+            position: relative;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+        }
+    </style>
+    <div id="gameScreen" class="game">
+        <canvas id="nes-canvas" width="256" height="240"></canvas>
+    </div>
+    <div id="ninjaPad"></div>
 </body></html>

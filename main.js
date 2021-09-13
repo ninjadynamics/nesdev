@@ -4,33 +4,48 @@ function isIOSDevice(){
    return !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
 }
 
-function resize() {
-	let h = window.screen.availHeight
-  	let w = window.screen.availWidth
-  	if (h > w) {
-		DEBUG && console.log("Show touch controls");
-		$(".game").width("100%");
-		let newWidth = $(".game").width();
-		$(".game").height(240 * (newWidth / 256));
-		$(".ninjapad").height(h - $(".game").height());
-		$(".ninjapad").show();
-		DEBUG && console.log("Mobile mode");
-	}
-	else {
-		$(".game").height("100%");
-		let newHeight = $(".game").height();
-		$(".game").width(256 * (newHeight / 240));
-		$(".ninjapad").hide();
-		DEBUG && console.log("Desktop mode");
-	}
+function setPageLayout() {
+    let h = window.screen.availHeight
+    let w = window.screen.availWidth
+    if (h >= w) {
+        DEBUG && console.log("Show touch controls");
+        let opacity = 1;
+        let bottom = "auto";
+
+        $("#gameScreen").width("100%");
+        let newWidth = $("#gameScreen").width();
+        $("#gameScreen").height(240 * (newWidth / 256));
+
+        let padHeight = vw(47.5);
+        $("#ninjaPad").height(padHeight);
+
+        let remainingHeight = h - $("#gameScreen").height();
+        let difference = remainingHeight - padHeight;
+        if (difference < 0) {
+            opacity += (difference / (padHeight * 2));
+            bottom = 0;
+        }
+
+        $("#ninjaPad").css("bottom", bottom);
+        $("#ninjaPad").css("opacity", opacity);
+        $("#ninjaPad").show();
+        DEBUG && console.log("Mobile mode");
+    }
+    else {
+        $("#gameScreen").height("100%");
+        let newHeight = $("#gameScreen").height();
+        $("#gameScreen").width(256 * (newHeight / 240));
+        $("#ninjaPad").hide();
+        DEBUG && console.log("Desktop mode");
+    }
 }
 
 $(window).resize(function() {
-	resize();
+    setPageLayout();
 });
 
 $(document).ready(function() {
-	resize();
-	loadNinjaPad("gameScreen");
-	nes_load_url("nes-canvas", "main.nes");
+    setPageLayout();
+    loadNinjaPad("gameScreen");
+    nes_load_url("nes-canvas", "main.nes");
 });

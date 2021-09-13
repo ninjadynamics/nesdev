@@ -34,14 +34,14 @@ var analog = {
 };
 
 function isButtonDown(eventType) {
-	return eventType.endsWith("start") || eventType.endsWith("move");
+    return eventType.endsWith("start") || eventType.endsWith("move");
 }
 
 function fnNesButtonPress(eventType) {
-	if (isButtonDown(eventType)) {
-		return nes.buttonDown;
-	}
-	return nes.buttonUp;
+    if (isButtonDown(eventType)) {
+        return nes.buttonDown;
+    }
+    return nes.buttonUp;
 }
 
 function vw(v) {
@@ -103,18 +103,18 @@ function analogTouch(event, touch) {
 }
 
 function buttonPress(event) {
-	// Prevent all the shenanigans that happen with a "long-press" on mobile
-	event.preventDefault();
+    // Prevent all the shenanigans that happen with a "long-press" on mobile
+    event.preventDefault();
 
-	// Get the source element
-	const src = event.srcElement;
+    // Get the source element
+    const src = event.srcElement;
 
-	// Handle the touch
-	for (const touch of event.changedTouches) {
-		// Ignore any touches where the target
-		// element doesn't match the source element
-		if (touch.target.id != src.id) continue;
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // Handle the touch
+    for (const touch of event.changedTouches) {
+        // Ignore any touches where the target
+        // element doesn't match the source element
+        if (touch.target.id != src.id) continue;
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
         // Handle the analog stick
         if (src.id == "ANALOG_STICK") {
@@ -122,27 +122,27 @@ function buttonPress(event) {
             return;
         }
 
-		// Get the element (either a button or the empty area of the gamepad)
-		// the user is physically touching right now
-		let element = $(document.elementFromPoint(touch.clientX, touch.clientY))[0];
+        // Get the element (either a button or the empty area of the gamepad)
+        // the user is physically touching right now
+        let element = $(document.elementFromPoint(touch.clientX, touch.clientY))[0];
 
-		// If it's a new touch, set the child button to its parent
-		if (event.type == "touchstart") {
-			childButton[src.id] = element;
-		}
-		// Otherwise, if the user is sliding its finger from one button to another
-		// or simply stops touching the screen with that finger
-		else if (childButton[src.id].id != element.id) {
+        // If it's a new touch, set the child button to its parent
+        if (event.type == "touchstart") {
+            childButton[src.id] = element;
+        }
+        // Otherwise, if the user is sliding its finger from one button to another
+        // or simply stops touching the screen with that finger
+        else if (childButton[src.id].id != element.id) {
         //else if (element.id && childButton[src.id].id != element.id) {
-			// Check which button (if any) the user had its finger on previously
-			let lastButton = childButton[src.id];
-			// If the user was actually pressing a button before
-			if (lastButton.id.startsWith("BUTTON")) {
-				// Tell the emulator to release that button
-				nes.buttonUp(1, eval("jsnes.Controller." + lastButton.id));
+            // Check which button (if any) the user had its finger on previously
+            let lastButton = childButton[src.id];
+            // If the user was actually pressing a button before
+            if (lastButton.id.startsWith("BUTTON")) {
+                // Tell the emulator to release that button
+                nes.buttonUp(1, eval("jsnes.Controller." + lastButton.id));
                 $(lastButton).css("border-style", "outset");
                 DEBUG && console.log("Released", lastButton.id); // Debug
-			}
+            }
             // Otherwise, if it was a multipress
             else if (lastButton.id.startsWith("MULTI")) {
                 // Get buttons
@@ -153,30 +153,30 @@ function buttonPress(event) {
                 $(lastButton).css("background-color", "transparent");
                 DEBUG && console.log("Released", lastButton.id); // Debug
             }
-			// Update the child button to be the one the user is touching right now
-			childButton[src.id] = element;
-		}
+            // Update the child button to be the one the user is touching right now
+            childButton[src.id] = element;
+        }
 
-		// If the user is actually interacting a button right now
-		if (element.id.startsWith("BUTTON")) {
+        // If the user is actually interacting a button right now
+        if (element.id.startsWith("BUTTON")) {
 
             // Get the correct function call
-			let fn = fnNesButtonPress(event.type)
+            let fn = fnNesButtonPress(event.type)
 
             // Send that button interaction to the emulator
-			fn(1, eval("jsnes.Controller." + element.id));
+            fn(1, eval("jsnes.Controller." + element.id));
 
-			// Resume emulation and show button presses / releases
-			if (isButtonDown(event.type)) {
+            // Resume emulation and show button presses / releases
+            if (isButtonDown(event.type)) {
                 emulationPaused = false;
                 $(element).css("border-style", "inset");
                 DEBUG && console.log("Pressed", element.id); // Debug
-			}
-			else {
+            }
+            else {
                 $(element).css("border-style", "outset");
                 DEBUG && console.log("Released", element.id);  // Debug
-			}
-		}
+            }
+        }
         // Otherwise, if it's actually two buttons at the same time
         else if (element.id.startsWith("MULTI")) {
 
@@ -192,15 +192,15 @@ function buttonPress(event) {
             // Resume emulation and show button presses / releases
             if (isButtonDown(event.type)) {
                 emulationPaused = false;
-				$(element).css("background-color", "#444");
+                $(element).css("background-color", "#444");
                 DEBUG && console.log("Pressed", element.id); // Debug
-			}
-			else {
-				$(element).css("background-color", "transparent");
+            }
+            else {
+                $(element).css("background-color", "transparent");
                 DEBUG && console.log("Released", element.id); // Debug
-			}
+            }
         }
-	}
+    }
 }
 
 function analogSwitch(event) {
@@ -252,60 +252,60 @@ function uploadROM(event) {
 function toggleFullScreen(event) {
     event.preventDefault();
     emulationPaused = false;
-	let element = document.body;
-	if (
-		!document.fullscreenElement &&
-   		!document.mozFullScreenElement &&
-		!document.webkitFullscreenElement
-	) {
-		if (element.requestFullScreen) {
-		     element.requestFullScreen();
-		} else if (element.webkitRequestFullScreen) {
-		     element.webkitRequestFullScreen();
-		} else if (element.mozRequestFullScreen) {
-		     element.mozRequestFullScreen();
-		} else if (element.msRequestFullscreen) {
-		     element.msRequestFullscreen();
-		} else if (element.webkitEnterFullscreen) {
-		    element.webkitEnterFullscreen(); //for iphone this code worked
-		}
-  	}
-	else {
-		if (document.cancelFullScreen) {
-			document.cancelFullScreen();
-		} else if (document.mozCancelFullScreen) {
-			document.mozCancelFullScreen();
-		} else if (document.webkitCancelFullScreen) {
-			document.webkitCancelFullScreen();
-		} else if (document.msExitFullscreen) {
-			document.msExitFullscreen();
-		}
-  	}
+    let element = document.body;
+    if (
+        !document.fullscreenElement &&
+        !document.mozFullScreenElement &&
+        !document.webkitFullscreenElement
+    ) {
+        if (element.requestFullScreen) {
+             element.requestFullScreen();
+        } else if (element.webkitRequestFullScreen) {
+             element.webkitRequestFullScreen();
+        } else if (element.mozRequestFullScreen) {
+             element.mozRequestFullScreen();
+        } else if (element.msRequestFullscreen) {
+             element.msRequestFullscreen();
+        } else if (element.webkitEnterFullscreen) {
+            element.webkitEnterFullscreen(); //for iphone this code worked
+        }
+      }
+    else {
+        if (document.cancelFullScreen) {
+            document.cancelFullScreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.webkitCancelFullScreen) {
+            document.webkitCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
+      }
 }
 
 function preventDefault(event) {
-	event.preventDefault();
+    event.preventDefault();
 }
 
 function assign(fn, elementName, ...touchEvents) {
-	// Prevent default on all events
-	let element = document.getElementById(elementName);
-	for (const e of TOUCH_EVENTS.split(' ')) {
-		eval("element.ontouch" + e + " = preventDefault");
-	}
-	// Assign function call to events
-	for (const e of touchEvents) {
-		eval("element.ontouch" + e + " = fn");
-	}
+    // Prevent default on all events
+    let element = document.getElementById(elementName);
+    for (const e of TOUCH_EVENTS.split(' ')) {
+        eval("element.ontouch" + e + " = preventDefault");
+    }
+    // Assign function call to events
+    for (const e of touchEvents) {
+        eval("element.ontouch" + e + " = fn");
+    }
 }
 function loadNinjaPad(gameScreen) {
-    $("#ninjapad").load(
-		"ninjapad.html",
-		function() {
-			assign(toggleFullScreen, gameScreen, "end");
-			assign(uploadROM, "loadROM", "start", "end");
-			assign(analogSwitch, "analogSwitch", "start", "end");
-			assign(buttonPress, "CONTROLLER", "start", "move", "end");
-		}
-	);
+    $("#ninjaPad").load(
+        "ninjapad.html",
+        function() {
+            assign(toggleFullScreen, gameScreen, "end");
+            assign(uploadROM, "loadROM", "start", "end");
+            assign(analogSwitch, "analogSwitch", "start", "end");
+            assign(buttonPress, "CONTROLLER", "start", "move", "end");
+        }
+    );
 }
