@@ -71,6 +71,7 @@ function analogTouch(event, touch) {
     let a = $("#ANALOG_STICK");
     switch (event.type) {
         case "touchstart":
+            emulationPaused = false;
             analog.touchX = touch.clientX;
             analog.touchY = touch.clientY;
             break;
@@ -140,7 +141,7 @@ function buttonPress(event) {
 				// Tell the emulator to release that button
 				nes.buttonUp(1, eval("jsnes.Controller." + lastButton.id));
                 $(lastButton).css("border-style", "outset");
-                console.log("Released", lastButton.id); // Debug
+                DEBUG && console.log("Released", lastButton.id); // Debug
 			}
             // Otherwise, if it was a multipress
             else if (lastButton.id.startsWith("MULTI")) {
@@ -150,7 +151,7 @@ function buttonPress(event) {
                     nes.buttonUp(1, eval("jsnes.Controller." + d));
                 }
                 $(lastButton).css("background-color", "transparent");
-                console.log("Released", lastButton.id); // Debug
+                DEBUG && console.log("Released", lastButton.id); // Debug
             }
 			// Update the child button to be the one the user is touching right now
 			childButton[src.id] = element;
@@ -165,15 +166,15 @@ function buttonPress(event) {
             // Send that button interaction to the emulator
 			fn(1, eval("jsnes.Controller." + element.id));
 
-			// Show button presses / releases
+			// Resume emulation and show button presses / releases
 			if (isButtonDown(event.type)) {
                 emulationPaused = false;
                 $(element).css("border-style", "inset");
-                console.log("Pressed", element.id); // Debug
+                DEBUG && console.log("Pressed", element.id); // Debug
 			}
 			else {
                 $(element).css("border-style", "outset");
-                console.log("Released", element.id);  // Debug
+                DEBUG && console.log("Released", element.id);  // Debug
 			}
 		}
         // Otherwise, if it's actually two buttons at the same time
@@ -188,15 +189,15 @@ function buttonPress(event) {
                 fn(1, eval("jsnes.Controller." + d));
             }
 
-            // Show button presses / releases
+            // Resume emulation and show button presses / releases
             if (isButtonDown(event.type)) {
                 emulationPaused = false;
 				$(element).css("background-color", "#444");
-                console.log("Pressed", element.id); // Debug
+                DEBUG && console.log("Pressed", element.id); // Debug
 			}
 			else {
 				$(element).css("background-color", "transparent");
-                console.log("Released", element.id); // Debug
+                DEBUG && console.log("Released", element.id); // Debug
 			}
         }
 	}
@@ -204,6 +205,7 @@ function buttonPress(event) {
 
 function analogSwitch(event) {
     event.preventDefault();
+    emulationPaused = false;
     if (event.type == "touchstart") {
         $("#analogSwitch").css("border-style", "inset");
         return;

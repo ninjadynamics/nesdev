@@ -341,38 +341,3 @@ window.addEventListener("gamepaddisconnected", disconnecthandler);
 if (!haveEvents) {
  setInterval(scangamepads, 500);
 }
-
-$(window).resize(function() {
-	resize();
-});
-
-function resize() {
-	let h = window.screen.availHeight
-  	let w = window.screen.availWidth
-  	if (h > w) {
-		console.log("Show touch controls");
-		$(".game").width("100%");
-		let newWidth = $(".game").width();
-		$(".game").height(240 * (newWidth / 256));
-		$(".ninjapad").height(h - $(".game").height());
-		$(".ninjapad").show();
-		console.log("Mobile mode");
-	}
-	else {
-		$(".game").height("100%");
-		let newHeight = $(".game").height();
-		$(".game").width(256 * (newHeight / 240));
-		$(".ninjapad").hide();
-		console.log("Desktop mode");
-	}
-}
-
-function isIOSDevice(){
-   return !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
-}
-
-$(document).ready(function() {
-	resize();
-	loadNinjaPad("gameScreen");
-	nes_load_url("nes-canvas", "main.nes");
-});
