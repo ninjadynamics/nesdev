@@ -18,8 +18,6 @@ const DPAD_BUTTONS = [
     ["BUTTON_DOWN", "BUTTON_LEFT" ],
 ]
 
-const DEADZONE = 1.2;
-
 // This object is necessary to handle the user
 // sliding their finger from one button to another
 var childButton = {};
@@ -254,7 +252,7 @@ function uploadROM(event) {
 function toggleFullScreen(event) {
     event.preventDefault();
     emulationPaused = false;
-    let element = document.body;
+    let element = document.getElementById("main");
     if (
         !document.fullscreenElement &&
         !document.mozFullScreenElement &&
@@ -308,6 +306,7 @@ function loadNinjaPad(gameScreen) {
             assign(uploadROM, "loadROM", "start", "end");
             assign(analogSwitch, "analogSwitch", "start", "end");
             assign(buttonPress, "CONTROLLER", "start", "move", "end");
+            assign(preventDefault, "ninjaPad");
         }
     );
 }

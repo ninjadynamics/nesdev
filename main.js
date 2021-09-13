@@ -1,5 +1,6 @@
 const DEBUG = false;
 const SINGLE_ROM = false;
+const DEADZONE = 2; //vw
 
 function isIOSDevice(){
    return !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
@@ -18,9 +19,9 @@ function setPageLayout() {
         $("#gameScreen").height(240 * (newWidth / 256));
 
         let padHeight = vw(47.5);
-        $("#ninjaPad").height(padHeight);
-
         let remainingHeight = h - $("#gameScreen").height();
+        $("#ninjaPad").height(Math.max(padHeight, remainingHeight));
+
         let difference = remainingHeight - padHeight;
         if (difference < 0) {
             opacity += (difference / (padHeight * 2));

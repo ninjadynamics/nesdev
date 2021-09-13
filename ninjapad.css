@@ -173,7 +173,7 @@
 }
 
 [id^="BUTTON"] {
-    background: #999;
+    background-color: #BBB;
     border: 1vw;
     border-style: outset;
 }
