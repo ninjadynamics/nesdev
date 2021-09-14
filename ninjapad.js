@@ -18,8 +18,6 @@ const DPAD_BUTTONS = [
     ["BUTTON_DOWN", "BUTTON_LEFT" ],
 ]
 
-const DEADZONE = 1.2;
-
 // This object is necessary to handle the user
 // sliding their finger from one button to another
 var childButton = {};
@@ -32,6 +30,8 @@ var analog = {
     deltaY: undefined,
     padBtn: undefined
 };
+
+var analogStick;
 
 function isButtonDown(eventType) {
     return eventType.endsWith("start") || eventType.endsWith("move");
@@ -67,38 +67,44 @@ function analogReset(element) {
     element.css("transform", "translate(0, 0)");
 }
 
-function analogTouch(event, touch) {
-    let a = $("#ANALOG_STICK");
-    switch (event.type) {
-        case "touchstart":
-            emulationPaused = false;
-            analog.touchX = touch.clientX;
-            analog.touchY = touch.clientY;
-            break;
+function analogTouch(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    for (const touch of event.changedTouches) {
+        // Ignore any touches where the target
+        // element doesn't match the source element
+        if (touch.target.id != event.target.id) continue;
 
-        case "touchmove":
-            analog.deltaX = touch.clientX - analog.touchX;
-            analog.deltaY = touch.clientY - analog.touchY;
+        switch (event.type) {
+            case "touchstart":
+                emulationPaused = false;
+                analog.touchX = touch.clientX;
+                analog.touchY = touch.clientY;
+                break;
 
-            let r = angle(analog.deltaX, analog.deltaY);
-            let d = Math.min(vw(10), dist(analog.deltaX, analog.deltaY));
+            case "touchmove":
+                analog.deltaX = touch.clientX - analog.touchX;
+                analog.deltaY = touch.clientY - analog.touchY;
 
-            let dx = Math.cos(r) * d;
-            let dy = Math.sin(r) * d;
-            a.css(
-                "transform",
-                "translate(" + dx + "px, " + dy + "px)"
-            );
-            let btnIndex = Math.floor(((180 + (45/2) + (r * 180 / Math.PI)) % 360) / 45);
-            analog.padBtn && pressButtons(nes.buttonUp, analog.padBtn);
-            analog.padBtn = d < vw(DEADZONE) ? null : DPAD_BUTTONS[btnIndex];
-            analog.padBtn && pressButtons(nes.buttonDown, analog.padBtn);
-            break;
+                let r = angle(analog.deltaX, analog.deltaY);
+                let d = Math.min(vw(10), dist(analog.deltaX, analog.deltaY));
 
-        default:
-            analog.padBtn && pressButtons(nes.buttonUp, analog.padBtn);
-            analogReset(a);
+                let dx = Math.cos(r) * d;
+                let dy = Math.sin(r) * d;
+                analogStick.css(
+                    "transform",
+                    "translate(" + dx + "px, " + dy + "px)"
+                );
+                let btnIndex = Math.floor(((180 + (45/2) + (r * 180 / Math.PI)) % 360) / 45);
+                analog.padBtn && pressButtons(nes.buttonUp, analog.padBtn);
+                analog.padBtn = d < vw(DEADZONE) ? null : DPAD_BUTTONS[btnIndex];
+                analog.padBtn && pressButtons(nes.buttonDown, analog.padBtn);
+                break;
 
+            default:
+                analog.padBtn && pressButtons(nes.buttonUp, analog.padBtn);
+                analogReset(analogStick);
+        }
     }
 }
 
@@ -107,20 +113,14 @@ function buttonPress(event) {
     event.preventDefault();
 
     // Get the source element
-    const src = event.srcElement;
+    target = event.target;
 
     // Handle the touch
     for (const touch of event.changedTouches) {
         // Ignore any touches where the target
         // element doesn't match the source element
-        if (touch.target.id != src.id) continue;
+        if (touch.target.id != target.id) continue;
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-        // Handle the analog stick
-        if (src.id == "ANALOG_STICK") {
-            analogTouch(event, touch);
-            return;
-        }
 
         // Get the element (either a button or the empty area of the gamepad)
         // the user is physically touching right now
@@ -128,14 +128,14 @@ function buttonPress(event) {
 
         // If it's a new touch, set the child button to its parent
         if (event.type == "touchstart") {
-            childButton[src.id] = element;
+            childButton[target.id] = element;
         }
         // Otherwise, if the user is sliding its finger from one button to another
         // or simply stops touching the screen with that finger
-        else if (childButton[src.id].id != element.id) {
-        //else if (element.id && childButton[src.id].id != element.id) {
+        else if (childButton[target.id].id != element.id) {
+        //else if (element.id && childButton[target.id].id != element.id) {
             // Check which button (if any) the user had its finger on previously
-            let lastButton = childButton[src.id];
+            let lastButton = childButton[target.id];
             // If the user was actually pressing a button before
             if (lastButton.id.startsWith("BUTTON")) {
                 // Tell the emulator to release that button
@@ -154,7 +154,7 @@ function buttonPress(event) {
                 DEBUG && console.log("Released", lastButton.id); // Debug
             }
             // Update the child button to be the one the user is touching right now
-            childButton[src.id] = element;
+            childButton[target.id] = element;
         }
 
         // If the user is actually interacting a button right now
@@ -254,7 +254,7 @@ function uploadROM(event) {
 function toggleFullScreen(event) {
     event.preventDefault();
     emulationPaused = false;
-    let element = document.body;
+    let element = document.getElementById("main");
     if (
         !document.fullscreenElement &&
         !document.mozFullScreenElement &&
@@ -300,6 +300,7 @@ function assign(fn, elementName, ...touchEvents) {
         eval("element.ontouch" + e + " = fn");
     }
 }
+
 function loadNinjaPad(gameScreen) {
     $("#ninjaPad").load(
         "ninjapad.html",
@@ -308,6 +309,11 @@ function loadNinjaPad(gameScreen) {
             assign(uploadROM, "loadROM", "start", "end");
             assign(analogSwitch, "analogSwitch", "start", "end");
             assign(buttonPress, "CONTROLLER", "start", "move", "end");
+            assign(analogTouch, "ANALOG_STICK", "start", "move", "end");
+            assign(preventDefault, "ninjaPad");
+
+            analogStick = $("#ANALOG_STICK");
+            // ...
         }
     );
 }

@@ -58,8 +58,8 @@
 
 .analogStick {
     position: absolute;
-    width: 60%;
-    height: 60%;
+    width: 62%;
+    height: 62%;
     box-sizing: border-box;
     border-radius: 50%;
     background-color: #666;
@@ -121,7 +121,7 @@
 .button_SELECT {
     position: absolute;
     left: 0%;
-    top: 31%;
+    top: 30%;
     width: 100%;
     height: 16%;
     box-sizing: border-box;
@@ -132,7 +132,7 @@
 .button_START {
     position: absolute;
     left: 0%;
-    top: 54%;
+    top: 55%;
     width: 100%;
     height: 16%;
     box-sizing: border-box;
@@ -173,7 +173,7 @@
 }
 
 [id^="BUTTON"] {
-    background: #999;
+    background-color: #BBB;
     border: 1vw;
     border-style: outset;
 }
