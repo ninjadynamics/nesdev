@@ -1,10 +1,6 @@
 const DEBUG = false;
-<<<<<<< HEAD
-const SINGLE_ROM = true;
-=======
 const SINGLE_ROM = false;
 const DEADZONE = 2; //vw
->>>>>>> devel
 
 function isIOSDevice(){
    return !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
