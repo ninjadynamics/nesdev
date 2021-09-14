@@ -43,7 +43,7 @@ function setPageLayout() {
         let newHeight = $("#gameScreen").height();
         $("#gameScreen").width(256 * (newHeight / 240));
         $("#ninjaPad").hide();
-        if (isMobileDevice) {
+        if (isMobileDevice()) {
             emulationPaused = true;
             alert("Landscape mode not supported at the moment");
             DEBUG && console.log("Mobile mode: Landscape");
