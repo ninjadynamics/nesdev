@@ -188,6 +188,7 @@
     font-family: KarmaticArcade;
     word-spacing: 0.5em;
     color: red;
+    visibility: hidden;
     background-color: rgba(0, 0, 0, 0.8);
 }
 
