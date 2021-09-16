@@ -31,7 +31,17 @@ var analog = {
     padBtn: undefined
 };
 
+// Pause
+const pauseMsg = "Emulation paused";
+var emulationPaused = false;
+var cannotResume = false;
+
+// jQuery Objects
+var ninjaPad;
+var controller;
 var analogStick;
+var gameScreen;
+var osd;
 
 function isButtonDown(eventType) {
     return eventType.endsWith("start") || eventType.endsWith("move");
@@ -77,7 +87,6 @@ function analogTouch(event) {
 
         switch (event.type) {
             case "touchstart":
-                emulationPaused = false;
                 analog.touchX = touch.clientX;
                 analog.touchY = touch.clientY;
                 break;
@@ -166,9 +175,8 @@ function buttonPress(event) {
             // Send that button interaction to the emulator
             fn(1, eval("jsnes.Controller." + element.id));
 
-            // Resume emulation and show button presses / releases
+            // Show button presses / releases
             if (isButtonDown(event.type)) {
-                emulationPaused = false;
                 $(element).css("border-style", "inset");
                 DEBUG && console.log("Pressed", element.id); // Debug
             }
@@ -191,7 +199,6 @@ function buttonPress(event) {
 
             // Resume emulation and show button presses / releases
             if (isButtonDown(event.type)) {
-                emulationPaused = false;
                 $(element).css("background-color", "#444");
                 DEBUG && console.log("Pressed", element.id); // Debug
             }
@@ -205,7 +212,6 @@ function buttonPress(event) {
 
 function analogSwitch(event) {
     event.preventDefault();
-    emulationPaused = false;
     if (event.type == "touchstart") {
         $("#analogSwitch").css("border-style", "inset");
         return;
@@ -233,7 +239,7 @@ function uploadROM(event) {
     $("#loadROM").css("border-style", "outset");
     if (SINGLE_ROM) return;
 
-    emulationPaused = true;
+    pauseEmulation();
     $('#upload').trigger('click');
 
     const inputElement = document.getElementById("upload");
@@ -244,7 +250,7 @@ function uploadROM(event) {
         var reader = new FileReader();
         reader.onload = function () {
             nes.loadROM(reader.result);
-            emulationPaused = false;
+            resumeEmulation();
         }
         reader.readAsBinaryString(f);
     }
@@ -253,7 +259,6 @@ function uploadROM(event) {
 // Only works for Android devices
 function toggleFullScreen(event) {
     event.preventDefault();
-    emulationPaused = false;
     let element = document.getElementById("main");
     if (
         !document.fullscreenElement &&
@@ -301,20 +306,38 @@ function assign(fn, elementName, ...touchEvents) {
     }
 }
 
-function loadNinjaPad(gameScreen) {
-    $("#ninjaPad").load(
-        "ninjapad.html",
-        function() {
-            assign(toggleFullScreen, gameScreen, "end");
-            assign(uploadROM, "loadROM", "start", "end");
-            assign(analogSwitch, "analogSwitch", "start", "end");
-            assign(buttonPress, "CONTROLLER", "start", "move", "end");
-            assign(analogTouch, "ANALOG_STICK", "start", "move", "end");
-            assign(preventDefault, "ninjaPad");
+function html(obj, id, text) {
+    return `<${obj} id='${id}'>${text}</${obj}>`;
+}
 
-            analogStick = $("#ANALOG_STICK");
-            // ...
-        }
+function pauseText() {
+    let resumeMsg = isMobileDevice() ? "Tap" : "Click";
+    resumeMsg += " to resume";
+    return html("span", "pauseText", pauseMsg + "<br/>" + resumeMsg);
+}
+
+function pauseEmulation(content=null) {
+    DEBUG && console.log("Emulation paused");
+    emulationPaused = true;
+    osd.empty();
+    osd.append(content || pauseText());
+    osd.show();
+}
+
+function resumeEmulation() {
+    DEBUG && console.log("Emulation resumed");
+    if (cannotResume) return;
+    emulationPaused = false;
+    osd.hide();
+}
+
+function handleLandscapeMode() {
+    cannotResume = true;
+    pauseEmulation(
+        html(
+            "span", "pauseText",
+            "Landscape mode not supported<br/>Please turn your device upright to play"
+        )
     );
 }
 
@@ -324,4 +347,143 @@ function loadState(s) {
 
 function saveState() {
     return JSON.stringify(nes.toJSON());
+}
+
+function setOSDLayout() {
+    let rect = gameScreen[0].getBoundingClientRect();
+    osd.css("top", rect.top);
+    osd.css("left", rect.left);
+    osd.css("height", gameScreen.height());
+    osd.css("width", gameScreen.width());
+}
+
+// function setPageLayout() {
+//     let w = window.innerWidth; // window.screen.availWidth;
+//     let h = window.innerHeight; // window.screen.availHeight;
+//
+//     if (h >= w || window.matchMedia("(orientation: portrait)").matches) {
+//         DEBUG && console.log("Show touch controls");
+//
+//         let opacity = 1;
+//         let bottom = "auto";
+//
+//         $("#gameScreen").width("100%");
+//         let newWidth = $("#gameScreen").width();
+//         $("#gameScreen").height(240 * (newWidth / 256));
+//
+//         let padHeight = vw(47.5);
+//         let remainingHeight = h - $("#gameScreen").height();
+//         $("#ninjaPad").height(Math.max(padHeight, remainingHeight));
+//
+//         let difference = remainingHeight - padHeight;
+//         if (difference < 0) {
+//             opacity += (difference / (padHeight * 2));
+//             bottom = 0;
+//         }
+//         $("#ninjaPad").css("bottom", bottom);
+//         $("#ninjaPad").css("opacity", opacity);
+//         $("#ninjaPad").css("display", "block");
+//
+//         $("#CONTROLLER").show();
+//
+//         if (cannotResume) {
+//             cannotResume = false;
+//             pauseEmulation();
+//         }
+//     }
+//     else {
+//         $("#gameScreen").height("100%");
+//         let newHeight = $("#gameScreen").height();
+//         $("#gameScreen").width(256 * (newHeight / 240));
+//
+//         $("#ninjaPad").height("0%");
+//         $("#CONTROLLER").hide();
+//
+//         if (isMobileDevice()) {
+//             handleLandscapeMode();
+//             DEBUG && console.log("Mobile mode: Landscape");
+//         }
+//         else {
+//             DEBUG && console.log("Desktop mode");
+//         }
+//     }
+//     setOSDLayout();
+// }
+
+function setDesktopLayout() {
+    gameScreen.height("100%");
+    let newHeight = $("#gameScreen").height();
+    gameScreen.width(256 * (newHeight / 240));
+    ninjaPad.height("0%");
+    controller.hide();
+}
+
+function setMobileLayout(height) {
+    let opacity = 1;
+    let bottom = "auto";
+
+    gameScreen.width("100%");
+    let newWidth = $("#gameScreen").width();
+    gameScreen.height(240 * (newWidth / 256));
+
+    let padHeight = vw(47.5);
+    let remainingHeight = height - $("#gameScreen").height();
+    ninjaPad.height(Math.max(padHeight, remainingHeight));
+
+    let difference = remainingHeight - padHeight;
+    if (difference < 0) {
+        opacity += (difference / (padHeight * 2));
+        bottom = 0;
+    }
+    ninjaPad.css("bottom", bottom);
+    ninjaPad.css("opacity", opacity);
+    ninjaPad.css("display", "block");
+
+    controller.show();
+
+    if (cannotResume) {
+        cannotResume = false;
+        pauseEmulation();
+    }
+}
+
+function setPageLayout() {
+    let w = window.innerWidth; // window.screen.availWidth;
+    let h = window.innerHeight; // window.screen.availHeight;
+    if (h >= w) {
+        DEBUG && console.log("Show touch controls");
+        setMobileLayout(h);
+    }
+    else {
+        setDesktopLayout();
+        if (isMobileDevice()) handleLandscapeMode();
+        DEBUG && console.log("Hide touch controls");
+    }
+    setOSDLayout();
+}
+
+function loadNinjaPad(gameScreenId) {
+    $("#ninjaPad").load(
+        "ninjapad.html",
+        function() {
+            // Cache frequently used objects
+            ninjaPad    = $("#ninjaPad");
+            gameScreen  = $("#" + gameScreenId);
+            controller  = $("#CONTROLLER");
+            analogStick = $("#ANALOG_STICK");
+            osd         = $("#OSD");
+
+            // Page setup
+            setPageLayout();
+
+            // Assign function calls to touch events
+            assign(toggleFullScreen, gameScreenId, "end");
+            assign(uploadROM, "loadROM", "start", "end");
+            assign(analogSwitch, "analogSwitch", "start", "end");
+            assign(buttonPress, "CONTROLLER", "start", "move", "end");
+            assign(analogTouch, "ANALOG_STICK", "start", "move", "end");
+            assign(preventDefault, "ninjaPad");
+            assign(resumeEmulation, "OSD", "end");
+        }
+    );
 }

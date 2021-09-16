@@ -18,9 +18,6 @@ var audio_samples_L = new Float32Array(SAMPLE_COUNT);
 var audio_samples_R = new Float32Array(SAMPLE_COUNT);
 var audio_write_cursor = 0, audio_read_cursor = 0;
 
-
-var emulationPaused = false;
-
 var nes = new jsnes.NES({
     onFrame: function(framebuffer_24){
         for(var i = 0; i < FRAMEBUFFER_SIZE; i++) framebuffer_u32[i] = 0xFF000000 | framebuffer_24[i];
