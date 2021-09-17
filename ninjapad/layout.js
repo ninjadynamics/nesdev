@@ -47,8 +47,9 @@ function setMobileLayout(height) {
 }
 
 function setPageLayout() {
-    let w = $(window).width(); //window.innerWidth; // window.screen.availWidth;
-    let h = $(window).height(); //window.innerHeight; // window.screen.availHeight;
+    let useJQuery = !isFullScreen() || isIOSDevice();
+    let w = useJQuery ? $(window).width() : window.innerWidth; // window.screen.availWidth;
+    let h = useJQuery ? $(window).height() : window.innerHeight; // window.screen.availHeight;
     if (h >= w || window.matchMedia("(orientation: portrait)").matches) {
         DEBUG && console.log("Show touch controls");
         setMobileLayout(h);
