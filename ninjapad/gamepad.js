@@ -83,7 +83,7 @@ function analogTouch(event) {
 
                 let dx = Math.cos(r) * d;
                 let dy = Math.sin(r) * d;
-                analogStick.css(
+                jQElement.analogStick.css(
                     "transform",
                     "translate(" + dx + "px, " + dy + "px)"
                 );
@@ -95,7 +95,7 @@ function analogTouch(event) {
 
             default:
                 analog.padBtn && pressButtons(emulator.buttonUp, analog.padBtn);
-                analogReset(analogStick);
+                analogReset(jQElement.analogStick);
         }
     }
 }

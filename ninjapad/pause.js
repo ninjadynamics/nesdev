@@ -19,9 +19,9 @@ function pauseEmulation(content=null) {
     emulator.pause();
     pauseScreen.visibility = "visible";
     pauseScreen.content = content || pauseText();
-    osd.empty();
-    osd.append(pauseScreen.content);
-    osd.css("visibility", pauseScreen.visibility);
+    jQElement.osd.empty();
+    jQElement.osd.append(pauseScreen.content);
+    jQElement.osd.css("visibility", pauseScreen.visibility);
     assign(preventDefault, "pauseScreenContent");
 }
 
@@ -31,5 +31,5 @@ function resumeEmulation() {
     emulationPaused = false;
     emulator.resume();
     pauseScreen.visibility = "hidden";
-    osd.css("visibility", pauseScreen.visibility);
+    jQElement.osd.css("visibility", pauseScreen.visibility);
 }

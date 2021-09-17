@@ -9,27 +9,48 @@ const INTERFACE = {
         },
 
         pause: function() {
-            audio_ctx.suspend();
-            audio_ctx = {resume: function(){}};
-            nes.break = true;
+            function _pause() {
+                if (nes.break) return;
+                // - - - - - - - - - - - - - - - - - - - - - - -
+                if (audio_ctx && audio_ctx.suspend) {
+                    audio_ctx.suspend();
+                }
+                audio_ctx = {
+                    resume: function(){},
+                    isNull: true
+                };
+                nes.break = true;
+                if (typeof enforcePause === 'undefined') {
+                    enforcePause = setInterval(_pause, 16);
+                }
+            }
+            _pause();
         },
 
         resume: function() {
-            audio_ctx = new window.AudioContext();
-            script_processor = audio_ctx.createScriptProcessor(AUDIO_BUFFERING, 0, 2);
-            script_processor.onaudioprocess = audio_callback;
-            script_processor.connect(audio_ctx.destination);
+            clearInterval(enforcePause);
+            enforcePause = undefined;
+            if (audio_ctx.isNull) {
+                audio_ctx = new window.AudioContext();
+                script_processor = audio_ctx.createScriptProcessor(AUDIO_BUFFERING, 0, 2);
+                script_processor.onaudioprocess = audio_callback;
+                script_processor.connect(audio_ctx.destination);
+            }
             audio_ctx.resume();
             nes.break = false;
         },
 
-        loadROM: function(f) {            
+        loadROM: function(f) {
             let reader = new FileReader();
             reader.onload = function () {
                 nes.loadROM(reader.result);
                 resumeEmulation();
             }
             reader.readAsBinaryString(f);
+        },
+
+        initialize: function(filename) {
+            nes_load_url(DISPLAY, ROMS_DIRECTORY + filename);
         }
 
         // ...

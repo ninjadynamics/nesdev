@@ -1,44 +1,44 @@
 function setOSDLayout() {
-    let rect = gameScreen[0].getBoundingClientRect();
-    osd.empty();
-    osd.css("top", rect.top);
-    osd.css("left", rect.left);
-    osd.css("height", gameScreen.height());
-    osd.css("width", gameScreen.width());
-    osd.css("visibility", pauseScreen.visibility);
-    osd.append(pauseScreen.content);
+    let rect = jQElement.screen[0].getBoundingClientRect();
+    jQElement.osd.empty();
+    jQElement.osd.css("top", rect.top);
+    jQElement.osd.css("left", rect.left);
+    jQElement.osd.css("height", jQElement.screen.height());
+    jQElement.osd.css("width", jQElement.screen.width());
+    jQElement.osd.css("visibility", pauseScreen.visibility);
+    jQElement.osd.append(pauseScreen.content);
 }
 
 function setDesktopLayout() {
-    gameScreen.height("100%");
-    let newHeight = gameScreen.height();
-    gameScreen.width(256 * (newHeight / 240));
-    ninjaPad.height("0%");
-    controller.hide();
+    jQElement.screen.height("100%");
+    let newHeight = jQElement.screen.height();
+    jQElement.screen.width(256 * (newHeight / 240));
+    jQElement.ninjaPad.height("0%");
+    jQElement.controller.hide();
 }
 
 function setMobileLayout(height) {
     let opacity = 1;
     let bottom = "auto";
 
-    gameScreen.width("100%");
-    let newWidth = gameScreen.width();
-    gameScreen.height(240 * (newWidth / 256));
+    jQElement.screen.width("100%");
+    let newWidth = jQElement.screen.width();
+    jQElement.screen.height(240 * (newWidth / 256));
 
     let padHeight = vw(47.5);
-    let remainingHeight = height - gameScreen.height();
-    ninjaPad.height(Math.max(padHeight, remainingHeight));
+    let remainingHeight = height - jQElement.screen.height();
+    jQElement.ninjaPad.height(Math.max(padHeight, remainingHeight));
 
     let difference = remainingHeight - padHeight;
     if (difference < 0) {
         opacity += (difference / (padHeight * 2));
         bottom = 0;
     }
-    ninjaPad.css("bottom", bottom);
-    ninjaPad.css("display", "block");
+    jQElement.ninjaPad.css("bottom", bottom);
+    jQElement.ninjaPad.css("display", "block");
 
-    controller.css("opacity", opacity);
-    controller.show();
+    jQElement.controller.css("opacity", opacity);
+    jQElement.controller.show();
 
     if (cannotResume) {
         cannotResume = false;

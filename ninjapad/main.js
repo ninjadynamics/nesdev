@@ -1,26 +1,21 @@
 // jQuery Objects
-var ninjaPad;
-var controller;
-var analogStick;
-var gameScreen;
-var osd;
+var jQElement = {};
 
 // Emulator interface
 var emulator;
 
-function loadNinjaPad(gameScreenId) {
-    ninjaPad    = $("#ninjaPad");
-    controller  = $("#CONTROLLER");
-    analogStick = $("#ANALOG_STICK");
-    osd         = $("#OSD");
-    gameScreen  = $("#" + gameScreenId);
-    emulator    = INTERFACE[EMULATOR];
+function loadNinjaPad() {
+    jQElement.ninjaPad    = $("#ninjaPad");
+    jQElement.controller  = $("#CONTROLLER");
+    jQElement.analogStick = $("#ANALOG_STICK");
+    jQElement.osd         = $("#OSD");
+    jQElement.screen      = $("#" + SCREEN);
 
     // Page setup
     setPageLayout();
 
     // Assign function calls to touch events
-    assign(toggleFullScreen, gameScreenId, "end");
+    assign(toggleFullScreen, SCREEN, "end");
     assign(uploadROM, "loadROM", "start", "end");
     assign(analogSwitch, "analogSwitch", "start", "end");
     assign(buttonPress, "CONTROLLER", "start", "move", "end");
@@ -37,11 +32,12 @@ window.onblur=function(event){
 // Reload layout on orientation change
 $(window).resize(function() {
     DEBUG && console.log("Window resize event");
-    loadNinjaPad("gameScreen");
+    loadNinjaPad();
 });
 
 $(document).ready(function() {
     DEBUG && console.log("Document ready event");
-    loadNinjaPad("gameScreen");
-    nes_load_url(GAME_SCREEN, ROMS_DIRECTORY + "main.nes");
+    emulator = INTERFACE[EMULATOR];
+    emulator.initialize("main.nes");
+    loadNinjaPad();
 });
