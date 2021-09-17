@@ -210,25 +210,18 @@ function analogSwitch(event) {
     jQElement.dpad.show();
 }
 
-function uploadROM(event) {
+function menu(event) {
     event.preventDefault();
     if (event.type == "touchstart") {
-        jQElement.loadROM.css("border-style", "inset");
+        jQElement.menu.css("border-style", "inset");
         return;
     }
-    jQElement.loadROM.css("border-style", "outset");
-    if (SINGLE_ROM) return;
-
-    pauseEmulation();
-    jQElement.upload.trigger("click");
-
-    const inputElement = document.getElementById("upload");
-    inputElement.addEventListener("change", handleFiles, false);
-
-    function handleFiles() {
-        let f = document.getElementById('upload').files[0];
-        emulator.loadROM(f);
+    jQElement.menu.css("border-style", "outset");
+    if (SINGLE_ROM) {
+        showCredits();
+        return;
     }
+    uploadROM(event);
 }
 
 // Doesn't work on iOS

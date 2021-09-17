@@ -9,7 +9,7 @@ function loadNinjaPad() {
         ninjaPad:     $("#ninjaPad"),
         controller:   $("#CONTROLLER"),
         analogSwitch: $("#analogSwitch"),
-        loadROM:      $("#loadROM"),
+        menu:         $("#menu"),
         upload:       $("#upload"),
         analogStick:  $("#ANALOG_STICK"),
         analog:       $("#ANALOG"),
@@ -23,7 +23,7 @@ function loadNinjaPad() {
 
     // Assign function calls to touch events
     assign(toggleFullScreen, SCREEN, "end");
-    assign(uploadROM, "loadROM", "start", "end");
+    assign(menu, "menu", "start", "end");
     assign(analogSwitch, "analogSwitch", "start", "end");
     assign(buttonPress, "CONTROLLER", "start", "move", "end");
     assign(analogTouch, "ANALOG_STICK", "start", "move", "end");

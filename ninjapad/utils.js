@@ -4,6 +4,10 @@ function preventDefault(event) {
     event.preventDefault();
 }
 
+function stopPropagation(event) {
+    event.stopPropagation();
+}
+
 function isIOSDevice(){
    return !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
 }
@@ -59,5 +63,12 @@ function assign(fn, elementName, ...touchEvents) {
     // Assign function call to events
     for (const e of touchEvents) {
         eval("element.ontouch" + e + " = fn");
+    }
+}
+
+function allowInteraction(elementName) {
+    let element = document.getElementById(elementName);
+    for (const e of TOUCH_EVENTS) {
+        eval("element.ontouch" + e + " = stopPropagation");
     }
 }
