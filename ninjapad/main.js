@@ -9,11 +9,12 @@ var osd;
 var emulator;
 
 function loadNinjaPad(gameScreenId) {
-    ninjaPad = $("#ninjaPad");
-    gameScreen  = $("#" + gameScreenId);
+    ninjaPad    = $("#ninjaPad");
     controller  = $("#CONTROLLER");
     analogStick = $("#ANALOG_STICK");
     osd         = $("#OSD");
+    gameScreen  = $("#" + gameScreenId);
+    emulator    = INTERFACE[EMULATOR];
 
     // Page setup
     setPageLayout();
@@ -35,10 +36,12 @@ window.onblur=function(event){
 
 // Reload layout on orientation change
 $(window).resize(function() {
+    DEBUG && console.log("Window resize event");
     loadNinjaPad("gameScreen");
 });
 
 $(document).ready(function() {
+    DEBUG && console.log("Document ready event");
     loadNinjaPad("gameScreen");
     nes_load_url(GAME_SCREEN, ROMS_DIRECTORY + "main.nes");
 });

@@ -47,9 +47,9 @@ function setMobileLayout(height) {
 }
 
 function setPageLayout() {
-    let w = window.innerWidth; // window.screen.availWidth;
-    let h = window.innerHeight; // window.screen.availHeight;
-    if (h >= w) {
+    let w = $(window).width(); //window.innerWidth; // window.screen.availWidth;
+    let h = $(window).height(); //window.innerHeight; // window.screen.availHeight;
+    if (h >= w || window.matchMedia("(orientation: portrait)").matches) {
         DEBUG && console.log("Show touch controls");
         setMobileLayout(h);
     }
@@ -66,7 +66,8 @@ function handleLandscapeMode() {
     pauseEmulation(
         html(
             "span", "pauseScreenContent",
-            "Landscape mode not supported<br/>Please turn your device upright to play"
+            `Landscape mode not supported at the moment<br/>
+            Please turn your device upright to play`
         )
     );
 }

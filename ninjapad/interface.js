@@ -1,4 +1,4 @@
-const interface = {
+const INTERFACE = {
     jsnes: {
         buttonDown: function() {
             // ...

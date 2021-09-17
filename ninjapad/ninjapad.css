@@ -186,6 +186,8 @@
     align-content: center;
     flex-direction: column;
     font-family: KarmaticArcade;
+    box-sizing: border-box;
+    padding: 2em;
     word-spacing: 0.5em;
     color: red;
     visibility: hidden;
