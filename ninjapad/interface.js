@@ -1,10 +1,10 @@
 const INTERFACE = {
     jsnes: {
-        buttonDown: function() {
+        buttonDown: function(b) {
             nes.buttonDown(1, eval("jsnes.Controller." + b));
         },
 
-        buttonUp: function() {
+        buttonUp: function(b) {
             nes.buttonUp(1, eval("jsnes.Controller." + b));
         },
 
@@ -21,8 +21,16 @@ const INTERFACE = {
             script_processor.connect(audio_ctx.destination);
             audio_ctx.resume();
             nes.break = false;
-        }
+        },
 
+        loadROM: function(f) {            
+            let reader = new FileReader();
+            reader.onload = function () {
+                nes.loadROM(reader.result);
+                resumeEmulation();
+            }
+            reader.readAsBinaryString(f);
+        }
 
         // ...
     }

@@ -35,16 +35,13 @@ function isButtonDown(eventType) {
     return eventType.endsWith("start") || eventType.endsWith("move");
 }
 
-function fnNesButtonPress(eventType) {
-    if (isButtonDown(eventType)) {
-        return nes.buttonDown;
-    }
-    return nes.buttonUp;
+function fnButtonPress(eventType) {
+    return isButtonDown(eventType) ? emulator.buttonDown : emulator.buttonUp;
 }
 
 function vw(v) {
-  let w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-  return (v * w) / 100;
+    let w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+    return (v * w) / 100;
 }
 
 function dist(dx, dy) {
@@ -56,9 +53,7 @@ function angle(dx, dy) {
 }
 
 function pressButtons(fn, buttons) {
-    for (const b of buttons) {
-        fn(1, eval("jsnes.Controller." + b));
-    }
+    for (const b of buttons) fn(b);
 }
 
 function analogReset(element) {
@@ -93,13 +88,13 @@ function analogTouch(event) {
                     "translate(" + dx + "px, " + dy + "px)"
                 );
                 let btnIndex = Math.floor(((180 + (45/2) + (r * 180 / Math.PI)) % 360) / 45);
-                analog.padBtn && pressButtons(nes.buttonUp, analog.padBtn);
+                analog.padBtn && pressButtons(emulator.buttonUp, analog.padBtn);
                 analog.padBtn = d < vw(DEADZONE) ? null : DPAD_BUTTONS[btnIndex];
-                analog.padBtn && pressButtons(nes.buttonDown, analog.padBtn);
+                analog.padBtn && pressButtons(emulator.buttonDown, analog.padBtn);
                 break;
 
             default:
-                analog.padBtn && pressButtons(nes.buttonUp, analog.padBtn);
+                analog.padBtn && pressButtons(emulator.buttonUp, analog.padBtn);
                 analogReset(analogStick);
         }
     }
@@ -136,7 +131,7 @@ function buttonPress(event) {
             // If the user was actually pressing a button before
             if (lastButton.id.startsWith("BUTTON")) {
                 // Tell the emulator to release that button
-                nes.buttonUp(1, eval("jsnes.Controller." + lastButton.id));
+                emulator.buttonUp(lastButton.id);
                 $(lastButton).css("border-style", "outset");
                 DEBUG && console.log("Released", lastButton.id); // Debug
             }
@@ -145,7 +140,7 @@ function buttonPress(event) {
                 // Get buttons
                 let key = lastButton.id.split("_").pop();
                 for (const d of MULTIPRESS[key]) {
-                    nes.buttonUp(1, eval("jsnes.Controller." + d));
+                    emulator.buttonUp(d);
                 }
                 $(lastButton).css("background-color", "transparent");
                 DEBUG && console.log("Released", lastButton.id); // Debug
@@ -157,11 +152,8 @@ function buttonPress(event) {
         // If the user is actually interacting a button right now
         if (element.id.startsWith("BUTTON")) {
 
-            // Get the correct function call
-            let fn = fnNesButtonPress(event.type)
-
-            // Send that button interaction to the emulator
-            fn(1, eval("jsnes.Controller." + element.id));
+            // Press / release that button
+            fnButtonPress(event.type)(element.id);
 
             // Show button presses / releases
             if (isButtonDown(event.type)) {
@@ -177,12 +169,12 @@ function buttonPress(event) {
         else if (element.id.startsWith("MULTI")) {
 
             // Get the correct function call
-            let fn = fnNesButtonPress(event.type)
+            let fn = fnButtonPress(event.type)
 
-            // Get buttons
+            // Get buttons and press / release them
             let key = element.id.split("_").pop();
             for (const d of MULTIPRESS[key]) {
-                fn(1, eval("jsnes.Controller." + d));
+                fn(d);
             }
 
             // Resume emulation and show button presses / releases
@@ -235,12 +227,7 @@ function uploadROM(event) {
 
     function handleFiles() {
         let f = document.getElementById('upload').files[0];
-        var reader = new FileReader();
-        reader.onload = function () {
-            nes.loadROM(reader.result);
-            resumeEmulation();
-        }
-        reader.readAsBinaryString(f);
+        emulator.loadROM(f);
     }
 }
 
