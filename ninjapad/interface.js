@@ -50,7 +50,7 @@ const INTERFACE = {
         },
 
         initialize: function(filename) {
-            nes_load_url(DISPLAY, ROMS_DIRECTORY + filename);
+            nes_load_url(DISPLAY, ROMS_DIRECTORY + "/" + filename);
         }
 
         // ...
