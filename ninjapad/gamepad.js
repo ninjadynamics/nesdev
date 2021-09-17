@@ -193,34 +193,34 @@ function buttonPress(event) {
 function analogSwitch(event) {
     event.preventDefault();
     if (event.type == "touchstart") {
-        $("#analogSwitch").css("border-style", "inset");
+        jQElement.analogSwitch.css("border-style", "inset");
         return;
     }
-    $("#analogSwitch").css("border-style", "outset");
+    jQElement.analogSwitch.css("border-style", "outset");
 
-    let d = $("#DPAD");
-    let a = $("#ANALOG");
-    if (a.css("display") == "none") {
+    if (jQElement.analog.css("display") == "none") {
         analog.active = true;
-        a.show(); d.hide();
-        analogReset(a);
+        jQElement.dpad.hide();
+        jQElement.analog.show();
+        analogReset(jQElement.analog);
         return;
     }
     analog.active = false;
-    a.hide(); d.show();
+    jQElement.analog.hide();
+    jQElement.dpad.show();
 }
 
 function uploadROM(event) {
     event.preventDefault();
     if (event.type == "touchstart") {
-        $("#loadROM").css("border-style", "inset");
+        jQElement.loadROM.css("border-style", "inset");
         return;
     }
-    $("#loadROM").css("border-style", "outset");
+    jQElement.loadROM.css("border-style", "outset");
     if (SINGLE_ROM) return;
 
     pauseEmulation();
-    $('#upload').trigger('click');
+    jQElement.upload.trigger("click");
 
     const inputElement = document.getElementById("upload");
     inputElement.addEventListener("change", handleFiles, false);
@@ -231,7 +231,7 @@ function uploadROM(event) {
     }
 }
 
-// Only works for Android devices
+// Doesn't work on iOS
 function toggleFullScreen(event) {
     event.preventDefault();
     let element = document.getElementById("main");

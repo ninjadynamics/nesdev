@@ -1,15 +1,22 @@
 // jQuery Objects
-var jQElement = {};
+var jQElement;
 
 // Emulator interface
 var emulator;
 
 function loadNinjaPad() {
-    jQElement.ninjaPad    = $("#ninjaPad");
-    jQElement.controller  = $("#CONTROLLER");
-    jQElement.analogStick = $("#ANALOG_STICK");
-    jQElement.osd         = $("#OSD");
-    jQElement.screen      = $("#" + SCREEN);
+    jQElement = {
+        ninjaPad:     $("#ninjaPad"),
+        controller:   $("#CONTROLLER"),
+        analogSwitch: $("#analogSwitch"),
+        loadROM:      $("#loadROM"),
+        upload:       $("#upload"),
+        analogStick:  $("#ANALOG_STICK"),
+        analog:       $("#ANALOG"),
+        dpad:         $("#DPAD"),
+        osd:          $("#OSD"),
+        screen:       $("#" + SCREEN),
+    };
 
     // Page setup
     setPageLayout();
