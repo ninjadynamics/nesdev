@@ -16,6 +16,7 @@ function pauseText() {
 function pauseEmulation(content=null) {
     DEBUG && console.log("Emulation paused");
     emulationPaused = true;
+    emulator.pause();
     pauseScreen.visibility = "visible";
     pauseScreen.content = content || pauseText();
     osd.empty();
@@ -28,6 +29,7 @@ function resumeEmulation() {
     DEBUG && console.log("Emulation resumed");
     if (cannotResume) return;
     emulationPaused = false;
+    emulator.resume();
     pauseScreen.visibility = "hidden";
     osd.css("visibility", pauseScreen.visibility);
 }

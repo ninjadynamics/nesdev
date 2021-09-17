@@ -1,3 +1,5 @@
+const TOUCH_EVENTS = ["start", "move", "end"];
+
 function preventDefault(event) {
     event.preventDefault();
 }
@@ -51,7 +53,7 @@ function html(obj, id, text) {
 function assign(fn, elementName, ...touchEvents) {
     // Prevent default on all events
     let element = document.getElementById(elementName);
-    for (const e of TOUCH_EVENTS.split(' ')) {
+    for (const e of TOUCH_EVENTS) {
         eval("element.ontouch" + e + " = preventDefault");
     }
     // Assign function call to events

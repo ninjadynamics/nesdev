@@ -9,11 +9,10 @@ const AUDIO_BUFFERING = 512;
 const SAMPLE_COUNT = 4*1024;
 const SAMPLE_MASK = SAMPLE_COUNT - 1;
 
-const TOUCH_EVENTS = "start move end";
-
 var canvas_ctx, image;
 var framebuffer_u8, framebuffer_u32;
 
+var audio_ctx, script_processor;
 var audio_samples_L = new Float32Array(SAMPLE_COUNT);
 var audio_samples_R = new Float32Array(SAMPLE_COUNT);
 var audio_write_cursor = 0, audio_read_cursor = 0;
@@ -43,10 +42,9 @@ function getSampleRate()
 
 function onAnimationFrame(){
     window.setTimeout(onAnimationFrame, 1000/60);
-
     image.data.set(framebuffer_u8);
     canvas_ctx.putImageData(image, 0, 0);
-    if (!emulationPaused) nes.frame();
+    nes.frame();
 }
 
 function audio_remain(){
@@ -54,7 +52,7 @@ function audio_remain(){
 }
 
 function audio_callback(event) {
-    if (nes.rom == null || emulationPaused) return;
+    if (nes.rom == null) return;
 
     var dst = event.outputBuffer;
     var len = dst.length;
@@ -123,11 +121,11 @@ function nes_init(canvas_id){
     framebuffer_u32 = new Uint32Array(buffer);
 
     // Setup audio.
-    var audio_ctx = new window.AudioContext();
-    var script_processor = audio_ctx.createScriptProcessor(AUDIO_BUFFERING, 0, 2);
+    audio_ctx = new window.AudioContext();
+    script_processor = audio_ctx.createScriptProcessor(AUDIO_BUFFERING, 0, 2);
     script_processor.onaudioprocess = audio_callback;
     script_processor.connect(audio_ctx.destination);
-    document.addEventListener('touchstart',  () => {audio_ctx.resume()});
+    document.addEventListener('touchstart',  () => { audio_ctx.resume() });
 }
 
 function nes_boot(rom_data){
