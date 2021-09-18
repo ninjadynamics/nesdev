@@ -34,9 +34,9 @@ $(document).ready(function() {
     DEBUG && console.log("Document ready event");
 
     // Pause on loss of focus
-    window.onblur=function(event){
+    $(window).blur(function() {
         !isEmulationPaused && isMobileDevice() && pauseEmulation();
-    }
+    });
 
     // Reload layout on orientation change
     $(window).resize(function() {

@@ -25,7 +25,7 @@ function showCredits() {
     pauseEmulation(
         html(
             "span", "pauseScreenContent",
-            `Follow me on Twitter:
+            `Follow me on Twitter:<br/>
             <a href="${link}" target="_blank">
             ninjadynamics
             </a>
