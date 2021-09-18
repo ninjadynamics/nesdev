@@ -40,8 +40,8 @@ function toggleMenu() {
         isMenuOpen = false;
         return;
     }
-    isMenuOpen = true;
     showCredits();
     allowInteraction("pauseScreenContent");
     assign(preventDefault, "OSD");
+    isMenuOpen = true;
 }

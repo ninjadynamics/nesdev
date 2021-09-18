@@ -32,5 +32,6 @@ function resumeEmulation() {
     pauseScreen.visibility = "hidden";
     jQElement.osd.css("visibility", pauseScreen.visibility);
     isEmulationPaused = false;
+    isMenuOpen = false;
     DEBUG && console.log("Emulation resumed");
 }
