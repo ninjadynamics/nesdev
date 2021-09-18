@@ -1,3 +1,5 @@
+var isMenuOpen;
+
 function loadState(s) {
     nes.fromJSON(JSON.parse(s));
 }
@@ -30,10 +32,16 @@ function showCredits() {
             `
         )
     );
-    allowInteraction("pauseScreenContent");
 }
 
-function xxx(event) {
-    event.stopPropagation();
-    console.log("hello!")
+function toggleMenu() {
+    if (!cannotResume && isMenuOpen) {
+        resumeEmulation();
+        isMenuOpen = false;
+        return;
+    }
+    isMenuOpen = true;
+    showCredits();
+    allowInteraction("pauseScreenContent");
+    assign(preventDefault, "OSD");
 }

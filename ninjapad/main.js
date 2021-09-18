@@ -28,22 +28,22 @@ function loadNinjaPad() {
     assign(buttonPress, "CONTROLLER", "start", "move", "end");
     assign(analogTouch, "ANALOG_STICK", "start", "move", "end");
     assign(preventDefault, "ninjaPad");
-    assign(resumeEmulation, "OSD", "end");
 }
-
-// Pause on loss of focus
-window.onblur=function(event){
-    !emulationPaused && isMobileDevice() && pauseEmulation();
-}
-
-// Reload layout on orientation change
-$(window).resize(function() {
-    DEBUG && console.log("Window resize event");
-    loadNinjaPad();
-});
 
 $(document).ready(function() {
     DEBUG && console.log("Document ready event");
+
+    // Pause on loss of focus
+    window.onblur=function(event){
+        !isEmulationPaused && isMobileDevice() && pauseEmulation();
+    }
+
+    // Reload layout on orientation change
+    $(window).resize(function() {
+        DEBUG && console.log("Window resize event");
+        loadNinjaPad();
+    });
+
     emulator = INTERFACE[EMULATOR];
     emulator.initialize("main.nes");
     loadNinjaPad();
