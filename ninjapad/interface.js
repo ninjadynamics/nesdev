@@ -58,12 +58,17 @@ const INTERFACE = {
         },
 
         saveState: function() {
-            return compress(JSON.stringify(nes.toJSON()));
+            const obj = nes.toJSON();
+            const str = JSON.stringify(obj);
+            const zip = compress(str);
+            return uint8ToUtf16.encode(zip);
         },
 
         loadState: function(s) {
-            s = new Uint8Array(JSON.parse(`[${s}]`));
-            nes.fromJSON(JSON.parse(decompress(s)));
+            const zip = uint8ToUtf16.decode(s);
+            const str = decompress(zip);
+            const obj = JSON.parse(str);
+            nes.fromJSON(obj);
         },
 
         initialize: function(filename) {
