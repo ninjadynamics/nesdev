@@ -89,12 +89,12 @@ function allowInteraction(elementName) {
     }
 }
 
-function compress(data) {
+function zip(data) {
     const buf = fflate.strToU8(data);
     return fflate.compressSync(buf, { level: 9, mem: 8 });
 }
 
-function decompress(data) {
+function unzip(data) {
     const decompressed = fflate.decompressSync(data);
     return fflate.strFromU8(decompressed);
 }

@@ -58,17 +58,28 @@ const INTERFACE = {
         },
 
         saveState: function() {
-            const obj = nes.toJSON();
-            const str = JSON.stringify(obj);
-            const zip = compress(str);
-            return uint8ToUtf16.encode(zip);
+            // const obj = nes.toJSON();
+            // const str = JSON.stringify(obj);
+            // const zip = zip(str);
+            // return uint8ToUtf16.encode(zip);
+            //
+            // The above doesn't work because of this:
+            // https://stackoverflow.com/questions/11170716/are-there-any-characters-that-are-not-allowed-in-localstorage
+            //
+            return zip(JSON.stringify(nes.toJSON()));
         },
 
         loadState: function(s) {
-            const zip = uint8ToUtf16.decode(s);
-            const str = decompress(zip);
-            const obj = JSON.parse(str);
-            nes.fromJSON(obj);
+            // const zip = uint8ToUtf16.decode(s);
+            // const str = unzip(zip);
+            // const obj = JSON.parse(str);
+            // nes.fromJSON(obj);
+            //
+            // The above doesn't work because of this:
+            // https://stackoverflow.com/questions/11170716/are-there-any-characters-that-are-not-allowed-in-localstorage
+            //
+            s = new Uint8Array(JSON.parse(`[${s}]`));
+            nes.fromJSON(JSON.parse(unzip(s)));
         },
 
         initialize: function(filename) {

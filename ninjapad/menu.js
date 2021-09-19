@@ -1,20 +1,68 @@
 var isMenuOpen;
 
+function mainMenu() {
+    const upload = "uploadROM()";
+    const save = "saveState();";
+    const load = "loadState();";
+    const reset = "reset();"
+    const about = "showCredits()";
+    return createMenu(null,
+        link("Load ROM", js=upload, hide=SINGLE_ROM),
+        link("Save State", js=save),
+        link("Load State", js=load),
+        link("Reset", js=reset),
+        link("About", js=about)
+    );
+}
 
 function loadState() {
+    function _showError() {
+        $("#pauseScreenContent").html(
+            html(
+                "div", "error",
+                "No save data"
+            )
+        );
+        assign(preventDefault, "pauseScreenContent");
+        assign(showMainMenu, "OSD", "end");
+    }
     const hash = sha256(emulator.getROMData());
     const data = localStorage.getItem(hash);
-    emulator.loadState(data);
+    if (data) {
+        emulator.loadState(data);
+        resumeEmulation();
+    }
+    else {
+        _showError();
+    }
 }
 
 function saveState() {
+    function _showError(e) {
+        $("#pauseScreenContent").html(
+            html(
+                "div", "error",
+                `Error:<br/>
+                ${e.message}`
+            )
+        );
+        assign(preventDefault, "pauseScreenContent");
+        assign(showMainMenu, "OSD", "end");
+    }
     const hash = sha256(emulator.getROMData());
     const data = emulator.saveState();
-    localStorage.setItem(hash, data);
+    try {
+        localStorage.setItem(hash, data);
+        resumeEmulation();
+    }
+    catch (e) {
+        _showError(e);
+    }
 }
 
 function reset() {
     emulator.reloadROM();
+    resumeEmulation();
 }
 
 function uploadROM() {
@@ -43,24 +91,21 @@ function showCredits() {
     );
 }
 
-function showMenuOptions() {
-    const upload = "uploadROM()";
-    const save = "saveState(); resumeEmulation();";
-    const load = "loadState(); resumeEmulation();";
-    const reset = "reset(); resumeEmulation();"
-    const about = "showCredits()";
-    pauseEmulation(
-        html(
-            "span", "pauseScreenContent",
-            createMenu(null,
-                link("Load ROM", js=upload, hide=SINGLE_ROM),
-                link("Save State", js=save),
-                link("Load State", js=load),
-                link("Reset", js=reset),
-                link("About", js=about)
-            )
-        )
+function showMainMenu() {
+    $("#pauseScreenContent").html(
+        mainMenu()
     );
+    allowInteraction("pauseScreenContent");
+    assign(preventDefault, "OSD");
+}
+
+function openMainMenu() {
+    pauseEmulation(
+        html("span", "pauseScreenContent", mainMenu())
+    );
+    allowInteraction("pauseScreenContent");
+    assign(preventDefault, "OSD");
+    isMenuOpen = true;
 }
 
 function toggleMenu() {
@@ -69,8 +114,5 @@ function toggleMenu() {
         isMenuOpen = false;
         return;
     }
-    showMenuOptions();
-    allowInteraction("pauseScreenContent");
-    assign(preventDefault, "OSD");
-    isMenuOpen = true;
+    openMainMenu();
 }
