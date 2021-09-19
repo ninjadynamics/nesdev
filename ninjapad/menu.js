@@ -1,14 +1,23 @@
 var isMenuOpen;
 
-function loadState(s) {
-    nes.fromJSON(JSON.parse(s));
+
+function loadState() {
+    const hash = sha256(emulator.getROMData());
+    const data = localStorage.getItem(hash);
+    emulator.loadState(data);
 }
 
 function saveState() {
-    return JSON.stringify(nes.toJSON());
+    const hash = sha256(emulator.getROMData());
+    const data = emulator.saveState();
+    localStorage.setItem(hash, data);
 }
 
-function uploadROM(event) {
+function reset() {
+    emulator.reloadROM();
+}
+
+function uploadROM() {
     jQElement.upload.trigger("click");
 
     const inputElement = document.getElementById("upload");
@@ -22,14 +31,34 @@ function uploadROM(event) {
 
 function showCredits() {
     let link = "https://twitter.com/ninjadynamics";
+    $("#pauseScreenContent").html(
+        html(
+            "div", "about",
+            `Follow me on Twitter:<br/>
+            <a href="${link}" target="_blank">
+            <font color="yellow">ninjadynamics</font>
+            </a>
+            `
+        )
+    );
+}
+
+function showMenuOptions() {
+    const upload = "uploadROM()";
+    const save = "saveState(); resumeEmulation();";
+    const load = "loadState(); resumeEmulation();";
+    const reset = "reset(); resumeEmulation();"
+    const about = "showCredits()";
     pauseEmulation(
         html(
             "span", "pauseScreenContent",
-            `Follow me on Twitter:<br/>
-            <a href="${link}" target="_blank">
-            ninjadynamics
-            </a>
-            `
+            createMenu(null,
+                link("Load ROM", js=upload, hide=SINGLE_ROM),
+                link("Save State", js=save),
+                link("Load State", js=load),
+                link("Reset", js=reset),
+                link("About", js=about)
+            )
         )
     );
 }
@@ -40,7 +69,7 @@ function toggleMenu() {
         isMenuOpen = false;
         return;
     }
-    showCredits();
+    showMenuOptions();
     allowInteraction("pauseScreenContent");
     assign(preventDefault, "OSD");
     isMenuOpen = true;

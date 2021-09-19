@@ -186,6 +186,7 @@
     align-content: center;
     flex-direction: column;
     font-family: KarmaticArcade;
+    font-size: 5vmin;
     box-sizing: border-box;
     padding: 2em;
     word-spacing: 0.5em;
@@ -196,22 +197,26 @@
 
 /* unvisited link */
 #OSD a:link {
-  color: yellow;
+  color: red;
+  text-decoration: none;
 }
 
 /* visited link */
 #OSD a:visited {
-  color: yellow;
+  color: red;
+  text-decoration: none;
 }
 
 /* mouse over link */
 #OSD a:hover {
-   color: yellow;
+   color: red;
+   text-decoration: none;
 }
 
 /* selected link */
 #OSD a:active {
-   color: lime;
+   color: yellow;
+   text-decoration: none;
 }
 
 #DEADZONE {
@@ -220,7 +225,7 @@
 
 @font-face {
     font-family: 'KarmaticArcade';
-    src: url('ka1.ttf') format('truetype');
+    src: url('res/ka1.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }

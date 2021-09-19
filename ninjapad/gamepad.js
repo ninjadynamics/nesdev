@@ -217,15 +217,7 @@ function menu(event) {
         return;
     }
     jQElement.menu.css("border-style", "outset");
-
-    // For now...
-    if (SINGLE_ROM) {
-        toggleMenu();
-    }
-    else {
-        pauseEmulation();
-        uploadROM();
-    }
+    toggleMenu();
 }
 
 // Doesn't work on iOS

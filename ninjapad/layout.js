@@ -67,8 +67,11 @@ function handleLandscapeMode() {
     pauseEmulation(
         html(
             "span", "pauseScreenContent",
-            `Landscape mode not supported at the moment<br/>
-            Please turn your device upright to play`
+            `Landscape mode<br/>
+            not supported yet<br/>
+            <br/>
+            Turn your device<br/>
+            upright to play`
         )
     );
 }

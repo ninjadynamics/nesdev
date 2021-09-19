@@ -49,6 +49,23 @@ const INTERFACE = {
             reader.readAsBinaryString(f);
         },
 
+        reloadROM: function() {
+            nes.reloadROM();
+        },
+
+        getROMData: function() {
+            return nes.romData;
+        },
+
+        saveState: function() {
+            return compress(JSON.stringify(nes.toJSON()));
+        },
+
+        loadState: function(s) {
+            s = new Uint8Array(JSON.parse(`[${s}]`));
+            nes.fromJSON(JSON.parse(decompress(s)));
+        },
+
         initialize: function(filename) {
             nes_load_url(DISPLAY, ROMS_DIRECTORY + "/" + filename);
         }

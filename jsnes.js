@@ -3783,7 +3783,7 @@ NES.prototype = {
 
   toJSON: function () {
     return {
-      romData: this.romData,
+      // romData: this.romData,
       cpu: this.cpu.toJSON(),
       mmap: this.mmap.toJSON(),
       ppu: this.ppu.toJSON(),
@@ -3792,7 +3792,7 @@ NES.prototype = {
 
   fromJSON: function (s) {
     this.reset();
-    this.romData = s.romData;
+    // this.romData = s.romData;
     this.cpu.fromJSON(s.cpu);
     this.mmap.fromJSON(s.mmap);
     this.ppu.fromJSON(s.ppu);

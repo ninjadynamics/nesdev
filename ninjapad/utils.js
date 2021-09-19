@@ -54,6 +54,22 @@ function html(obj, id, text) {
     return `<${obj} id='${id}'>${text}</${obj}>`;
 }
 
+function link(content, js, hide) {
+    js = `${js}; return false;`;
+    return hide || `<a href="#" onclick="${js}">${content}</a>`;
+}
+
+function createMenu(title, ...opts) {
+    opts = opts.filter(e => e !== true);
+    title = title ? `${title}<br/>` : "";
+    return (
+        `<div style="line-height: 2.2em;">
+            ${title}
+            ${opts.join("<br/>")}
+        </div>`
+    );
+}
+
 function assign(fn, elementName, ...touchEvents) {
     // Prevent default on all events
     let element = document.getElementById(elementName);
@@ -71,4 +87,14 @@ function allowInteraction(elementName) {
     for (const e of TOUCH_EVENTS) {
         eval("element.ontouch" + e + " = stopPropagation");
     }
+}
+
+function compress(data) {
+    const buf = fflate.strToU8(data);
+    return fflate.compressSync(buf, { level: 9, mem: 8 });
+}
+
+function decompress(data) {
+    const decompressed = fflate.decompressSync(data);
+    return fflate.strFromU8(decompressed);
 }
