@@ -16,39 +16,23 @@ function mainMenu() {
 }
 
 function loadState() {
-    function _showError() {
-        $("#pauseScreenContent").html(
-            html(
-                "div", "error",
-                "No save data"
-            )
-        );
-        assign(preventDefault, "pauseScreenContent");
-        assign(showMainMenu, "OSD", "end");
-    }
     const hash = sha256(emulator.getROMData());
     const data = localStorage.getItem(hash);
-    if (data) {
+    if (!data) {
+        showError("No save data");
+        return;
+    }
+    try {
         emulator.loadState(data);
         resumeEmulation();
     }
-    else {
-        _showError();
+    catch (e) {
+        showError(`Error<br/><br/>${e.message}`);
+        DEBUG && console.log(e);
     }
 }
 
 function saveState() {
-    function _showError(e) {
-        $("#pauseScreenContent").html(
-            html(
-                "div", "error",
-                `Error:<br/>
-                ${e.message}`
-            )
-        );
-        assign(preventDefault, "pauseScreenContent");
-        assign(showMainMenu, "OSD", "end");
-    }
     const hash = sha256(emulator.getROMData());
     const data = emulator.saveState();
     try {
@@ -56,7 +40,8 @@ function saveState() {
         resumeEmulation();
     }
     catch (e) {
-        _showError(e);
+        showError(`Error<br/><br/>${e.message}`);
+        DEBUG && console.log(e);
     }
 }
 
@@ -75,6 +60,14 @@ function uploadROM() {
         let f = document.getElementById('upload').files[0];
         emulator.loadROM(f);
     }
+}
+
+function showError(msg) {
+    $("#pauseScreenContent").html(
+        html("div", "error", msg)
+    );
+    assign(preventDefault, "pauseScreenContent");
+    assign(showMainMenu, "OSD", "end");
 }
 
 function showCredits() {
