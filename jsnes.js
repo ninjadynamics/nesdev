@@ -3787,6 +3787,7 @@ NES.prototype = {
       cpu: this.cpu.toJSON(),
       mmap: this.mmap.toJSON(),
       ppu: this.ppu.toJSON(),
+      papu: this.papu.toJSON(),
     };
   },
 
@@ -3796,12 +3797,15 @@ NES.prototype = {
     this.cpu.fromJSON(s.cpu);
     this.mmap.fromJSON(s.mmap);
     this.ppu.fromJSON(s.ppu);
+    this.papu.fromJSON(s.papu);
   },
 };
 
 module.exports = NES;
 
 },{"./controller":1,"./cpu":2,"./papu":6,"./ppu":7,"./rom":8}],6:[function(require,module,exports){
+var utils = require("./utils");
+
 var CPU_FREQ_NTSC = 1789772.5; //1789772.72727272d;
 // var CPU_FREQ_PAL = 1773447.4;
 
@@ -4522,6 +4526,71 @@ PAPU.prototype = {
     this.dacRange = max_sqr + max_tnd;
     this.dcValue = this.dacRange / 2;
   },
+
+  JSON_PROPERTIES: [
+    "frameIrqCounter",
+    "frameIrqCounterMax",
+    "initCounter",
+    "channelEnableValue",
+    "sampleRate",
+    "frameIrqEnabled",
+    "frameIrqActive",
+    "frameClockNow",
+    "startedPlaying",
+    "recordOutput",
+    "initingHardware",
+    "masterFrameCounter",
+    "derivedFrameCounter",
+    "countSequence",
+    "sampleTimer",
+    "frameTime",
+    "sampleTimerMax",
+    "sampleCount",
+    "triValue",
+    "smpSquare1",
+    "smpSquare2",
+    "smpTriangle",
+    "smpDmc",
+    "accCount",
+    "prevSampleL",
+    "prevSampleR",
+    "smpAccumL",
+    "smpAccumR",
+    "masterVolume",
+    "stereoPosLSquare1",
+    "stereoPosLSquare2",
+    "stereoPosLTriangle",
+    "stereoPosLNoise",
+    "stereoPosLDMC",
+    "stereoPosRSquare1",
+    "stereoPosRSquare2",
+    "stereoPosRTriangle",
+    "stereoPosRNoise",
+    "stereoPosRDMC",
+    "extraCycles",
+    "maxSample",
+    "minSample",
+    "panning",
+  ],
+
+  toJSON: function () {
+    let obj = utils.toJSON(this);
+    obj.dmc = this.dmc.toJSON();
+    obj.noise = this.noise.toJSON();
+    obj.square1 = this.square1.toJSON();
+    obj.square2 = this.square2.toJSON();
+    obj.triangle = this.triangle.toJSON();
+    return obj;
+  },
+
+  fromJSON: function (s) {
+    utils.fromJSON(this, s);
+    this.dmc.fromJSON(s.dmc);
+    this.noise.fromJSON(s.noise);
+    this.square1.fromJSON(s.square1);
+    this.square2.fromJSON(s.square2);
+    this.triangle.fromJSON(s.triangle);
+  },
 };
 
 var ChannelDM = function (papu) {
@@ -4702,6 +4771,37 @@ ChannelDM.prototype = {
     this.reg4013 = 0;
     this.data = 0;
   },
+
+  JSON_PROPERTIES: [
+    "MODE_NORMAL",
+    "MODE_LOOP",
+    "MODE_IRQ",
+    "isEnabled",
+    "hasSample",
+    "irqGenerated",
+    "playMode",
+    "dmaFrequency",
+    "dmaCounter",
+    "deltaCounter",
+    "playStartAddress",
+    "playAddress",
+    "playLength",
+    "playLengthCounter",
+    "shiftCounter",
+    "reg4012",
+    "reg4013",
+    "sample",
+    "dacLsb",
+    "data"
+  ],
+
+  toJSON: function () {
+    return utils.toJSON(this);
+  },
+
+  fromJSON: function (s) {
+    utils.fromJSON(this, s);
+  },
 };
 
 var ChannelNoise = function (papu) {
@@ -4826,6 +4926,37 @@ ChannelNoise.prototype = {
 
   getLengthStatus: function () {
     return this.lengthCounter === 0 || !this.isEnabled ? 0 : 1;
+  },
+
+  JSON_PROPERTIES: [
+    "isEnabled",
+    "envDecayDisable",
+    "envDecayLoopEnable",
+    "lengthCounterEnable",
+    "envReset",
+    "shiftNow",
+    "lengthCounter",
+    "progTimerCount",
+    "progTimerMax",
+    "envDecayRate",
+    "envDecayCounter",
+    "envVolume",
+    "masterVolume",
+    "shiftReg",
+    "randomBit",
+    "randomMode",
+    "sampleValue",
+    "accValue",
+    "accCount",
+    "tmp"
+  ],
+
+  toJSON: function () {
+    return utils.toJSON(this);
+  },
+
+  fromJSON: function (s) {
+    utils.fromJSON(this, s);
   },
 };
 
@@ -5034,6 +5165,41 @@ ChannelSquare.prototype = {
   getLengthStatus: function () {
     return this.lengthCounter === 0 || !this.isEnabled ? 0 : 1;
   },
+
+  JSON_PROPERTIES: [
+    "isEnabled",
+    "lengthCounterEnable",
+    "sweepActive",
+    "envDecayDisable",
+    "envDecayLoopEnable",
+    "envReset",
+    "sweepCarry",
+    "updateSweepPeriod",
+    "progTimerCount",
+    "progTimerMax",
+    "lengthCounter",
+    "squareCounter",
+    "sweepCounter",
+    "sweepCounterMax",
+    "sweepMode",
+    "sweepShiftAmount",
+    "envDecayRate",
+    "envDecayCounter",
+    "envVolume",
+    "masterVolume",
+    "dutyMode",
+    "sweepResult",
+    "sampleValue",
+    "vol",
+  ],
+
+  toJSON: function () {
+    return utils.toJSON(this);
+  },
+
+  fromJSON: function (s) {
+    utils.fromJSON(this, s);
+  },
 };
 
 var ChannelTriangle = function (papu) {
@@ -5170,11 +5336,35 @@ ChannelTriangle.prototype = {
       this.linearCounter > 0 &&
       this.lengthCounter > 0;
   },
+
+  JSON_PROPERTIES: [
+    "isEnabled",
+    "sampleCondition",
+    "lengthCounterEnable",
+    "lcHalt",
+    "lcControl",
+    "progTimerCount",
+    "progTimerMax",
+    "triangleCounter",
+    "lengthCounter",
+    "linearCounter",
+    "lcLoadValue",
+    "sampleValue",
+    "tmp",
+  ],
+
+  toJSON: function () {
+    return utils.toJSON(this);
+  },
+
+  fromJSON: function (s) {
+    utils.fromJSON(this, s);
+  },
 };
 
 module.exports = PAPU;
 
-},{}],7:[function(require,module,exports){
+},{"./utils":10}],7:[function(require,module,exports){
 var Tile = require("./tile");
 var utils = require("./utils");
 
