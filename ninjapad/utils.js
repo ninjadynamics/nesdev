@@ -1,5 +1,9 @@
 const TOUCH_EVENTS = ["start", "move", "end"];
 
+Number.prototype.mod = function(n) {
+    return ((this%n)+n)%n;
+};
+
 function preventDefault(event) {
     event.preventDefault();
 }
@@ -97,4 +101,23 @@ function zip(data) {
 function unzip(data) {
     const decompressed = fflate.decompressSync(data);
     return fflate.strFromU8(decompressed);
+}
+
+function equal (buf1, buf2)
+{
+    var result = true;
+    if (buf1.byteLength != buf2.byteLength) {
+        console.log("size", buf1.byteLength, buf2.byteLength);
+        return false;
+    }
+    var dv1 = new Int8Array(buf1);
+    var dv2 = new Int8Array(buf2);
+    for (var i = 0 ; i != buf1.byteLength ; i++)
+    {
+        if (dv1[i] != dv2[i]) {
+            result = false;
+            console.log(i, dv1[i], dv2[i]);
+        }
+    }
+    return result;
 }
