@@ -44,6 +44,10 @@ $(document).ready(function() {
         loadNinjaPad();
     });
 
+    $(window).keyup(function(e) {
+      if (e.code == "Escape") toggleMenu();
+    });
+
     emulator = INTERFACE[EMULATOR];
     emulator.initialize("main.nes");
     loadNinjaPad();
