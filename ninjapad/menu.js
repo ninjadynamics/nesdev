@@ -23,7 +23,9 @@ function loadState() {
         return;
     }
     try {
-        emulator.loadState(data);
+        emulator.loadState(
+            uint8ToUtf16.decode(data)
+        );
         resumeEmulation();
     }
     catch (e) {
@@ -36,7 +38,8 @@ function saveState() {
     const hash = sha256(emulator.getROMData());
     const data = emulator.saveState();
     try {
-        localStorage.setItem(hash, data);
+        const optimizedData = uint8ToUtf16.encode(data);
+        localStorage.setItem(hash, optimizedData);
         resumeEmulation();
     }
     catch (e) {
@@ -57,8 +60,27 @@ function uploadROM() {
     inputElement.addEventListener("change", handleFiles, false);
 
     function handleFiles() {
+        let saveData = null;
+        if (emulator.isROMLoaded()) {
+            saveData = emulator.saveState();
+        }
         let f = document.getElementById('upload').files[0];
-        emulator.loadROM(f);
+        let reader = new FileReader();
+        reader.onload = function () {
+            try {
+                emulator.loadROMData(reader.result);
+                resumeEmulation();
+            }
+            catch (e) {
+                if (saveData) {
+                    emulator.reloadROM();
+                    emulator.loadState(saveData);
+                }
+                showError(`Error<br/><br/>${e.message.strip(".")}`);
+                DEBUG && console.log(e);
+            }
+        }
+        reader.readAsBinaryString(f);
     }
 }
 

@@ -4,6 +4,11 @@ Number.prototype.mod = function(n) {
     return ((this%n)+n)%n;
 };
 
+String.prototype.strip = function (string) {
+    var escaped = string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+    return this.replace(RegExp("^[" + escaped + "]+|[" + escaped + "]+$", "gm"), '');
+};
+
 function preventDefault(event) {
     event.preventDefault();
 }
@@ -79,6 +84,7 @@ function assign(fn, elementName, ...touchEvents) {
     let element = document.getElementById(elementName);
     for (const e of TOUCH_EVENTS) {
         eval("element.ontouch" + e + " = preventDefault");
+        eval("element.ontouch" + e + " = stopPropagation");
     }
     // Assign function call to events
     for (const e of touchEvents) {

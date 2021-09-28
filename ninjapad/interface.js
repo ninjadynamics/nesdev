@@ -28,6 +28,7 @@ const INTERFACE = {
         },
 
         resume: function() {
+            if (!nes.rom.header) return;
             clearInterval(enforcePause);
             enforcePause = undefined;
             if (audio_ctx.isNull) {
@@ -40,13 +41,8 @@ const INTERFACE = {
             nes.break = false;
         },
 
-        loadROM: function(f) {
-            let reader = new FileReader();
-            reader.onload = function () {
-                nes.loadROM(reader.result);
-                resumeEmulation();
-            }
-            reader.readAsBinaryString(f);
+        loadROMData: function(d) {
+            nes.loadROM(d);
         },
 
         reloadROM: function() {
@@ -60,18 +56,17 @@ const INTERFACE = {
         saveState: function() {
             const o = nes.toJSON();
             const s = JSON.stringify(o);
-            const z = zip(s);
-            return uint8ToUtf16.encode(z);
-            // return zip(JSON.stringify(nes.toJSON()));
+            return zip(s);
         },
 
-        loadState: function(d) {
-            const z = uint8ToUtf16.decode(d);
+        loadState: function(z) {
             const s = unzip(z);
             const o = JSON.parse(s);
             nes.fromJSON(o);
-            // d = new Uint8Array(JSON.parse(`[${d}]`));
-            // nes.fromJSON(JSON.parse(unzip(d)));
+        },
+
+        isROMLoaded: function() {
+            return !!nes.rom.header
         },
 
         initialize: function(filename) {

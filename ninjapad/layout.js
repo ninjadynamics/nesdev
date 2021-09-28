@@ -7,6 +7,7 @@ function setOSDLayout() {
     jQElement.osd.css("width", jQElement.screen.width());
     jQElement.osd.css("visibility", pauseScreen.visibility);
     jQElement.osd.append(pauseScreen.content);
+    jQElement.osd.detach().appendTo("#SCREEN");
 }
 
 function setDesktopLayout(width, height) {
@@ -21,12 +22,13 @@ function setDesktopLayout(width, height) {
         let newWidth = jQElement.screen.width();
         jQElement.screen.height(240 * (newWidth / 256));
     }
-    jQElement.ninjaPad.height("0%");
+    jQElement.gamepad.height("0%");
     jQElement.controller.hide();
 }
 
 function setMobileLayout(width, height) {
     DEBUG && console.log("Mobile mode");
+    jQElement.screen.detach().appendTo("#SCREEN");
     if (height >= width || window.matchMedia("(orientation: portrait)").matches) {
         let opacity = 1;
         let bottom = "auto";
@@ -37,15 +39,15 @@ function setMobileLayout(width, height) {
 
         let padHeight = vw(47.5);
         let remainingHeight = height - jQElement.screen.height();
-        jQElement.ninjaPad.height(Math.max(padHeight, remainingHeight));
+        jQElement.gamepad.height(Math.max(padHeight, remainingHeight));
 
         let difference = remainingHeight - padHeight;
         if (difference < 0) {
             opacity += (difference / (padHeight * 2));
             bottom = 0;
         }
-        jQElement.ninjaPad.css("bottom", bottom);
-        jQElement.ninjaPad.css("display", "block");
+        jQElement.gamepad.css("bottom", bottom);
+        jQElement.gamepad.css("display", "block");
 
         jQElement.controller.css("opacity", opacity);
         jQElement.controller.show();
@@ -64,10 +66,14 @@ function setMobileLayout(width, height) {
 }
 
 function setPageLayout() {
+    //$("#main").not("#emu-screen").not("#emu-screen *").remove();
+    //$("body *").not("#emu-screen").not("#emu-screen *").not("#ninjaPad *").not("#ninjaPad").hide(); $("body").css("background-color", "#222");
+    //console.log($("body *").not("#emu-screen *").not("#emu-screen").not("#ninjaPad *").not("#ninjaPad"))
     let useJQuery = !isFullScreen() || isIOSDevice();
     let w = useJQuery ? $(window).width() : window.innerWidth; // window.screen.availWidth;
     let h = useJQuery ? $(window).height() : window.innerHeight; // window.screen.availHeight;
-    isMobileDevice() ? setMobileLayout(w, h) : setDesktopLayout(w, h);
+    //isMobileDevice() ? setMobileLayout(w, h) : setDesktopLayout(w, h);
+    setMobileLayout(w, h);
     setOSDLayout();
 }
 

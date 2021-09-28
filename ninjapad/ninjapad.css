@@ -1,4 +1,10 @@
-#ninjaPad {
+/* #ninjaPad {
+    position: absolute;
+    width: 100%;
+    display: none;
+} */
+
+#GAMEPAD {
     position: absolute;
     width: 100%;
     display: none;
