@@ -20,13 +20,14 @@ function pauseEmulation(content=null) {
     jQElement.osd.empty();
     jQElement.osd.append(pauseScreen.content);
     jQElement.osd.css("visibility", pauseScreen.visibility);
-    assign(preventDefault, "pauseScreenContent");
-    assign(resumeEmulation, "OSD", "end");
     isEmulationPaused = true;
+    assign(null, "pauseScreenContent");
+    assignNoPropagation(resumeEmulation, "OSD", "end");
     DEBUG && console.log("Emulation paused");
 }
 
-function resumeEmulation() {
+function resumeEmulation(event) {
+    if (event) event.stopPropagation();
     if (cannotResume) return;
     emulator.resume();
     pauseScreen.visibility = "hidden";

@@ -9,6 +9,11 @@ String.prototype.strip = function (string) {
     return this.replace(RegExp("^[" + escaped + "]+|[" + escaped + "]+$", "gm"), '');
 };
 
+function preventDefaultWithoutPropagation(event) {
+    event.preventDefault();
+    event.stopPropagation();
+}
+
 function preventDefault(event) {
     event.preventDefault();
 }
@@ -84,12 +89,24 @@ function assign(fn, elementName, ...touchEvents) {
     let element = document.getElementById(elementName);
     for (const e of TOUCH_EVENTS) {
         eval("element.ontouch" + e + " = preventDefault");
-        //eval("element.ontouch" + e + " = stopPropagation");
     }
     // Assign function call to events
     for (const e of touchEvents) {
         eval("element.ontouch" + e + " = fn");
     }
+}
+
+function assignNoPropagation(fn, elementName, ...touchEvents) {
+    // Prevent default and stop propagation on all events
+    let element = document.getElementById(elementName);
+    for (const e of TOUCH_EVENTS) {
+        eval("element.ontouch" + e + " = preventDefaultWithoutPropagation");
+    }
+    // Assign function call to events
+    for (const e of touchEvents) {
+        eval("element.ontouch" + e + " = fn");
+    }
+    console.log("yeah")
 }
 
 function allowInteraction(elementName) {

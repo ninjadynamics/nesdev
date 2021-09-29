@@ -19,7 +19,6 @@ function setOSDLayout() {
     jQElement.osd.css("width", jQElement.screen.width());
     jQElement.osd.css("visibility", pauseScreen.visibility);
     jQElement.osd.append(pauseScreen.content);
-    assign(null, "OSD");
 }
 
 function setDesktopLayout(width, height) {

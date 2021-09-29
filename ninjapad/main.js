@@ -22,12 +22,12 @@ function loadNinjaPad() {
     setPageLayout();
 
     // Assign function calls to touch events
-    assign(toggleFullScreen, SCREEN, "end");
     assign(menu, "menu", "start", "end");
     assign(analogSwitch, "analogSwitch", "start", "end");
     assign(buttonPress, "GAMEPAD-BUTTONS", "start", "move", "end");
     assign(analogTouch, "ANALOG_STICK", "start", "move", "end");
-    assign(null, "GAMEPAD");    
+    assignNoPropagation(null, "GAMEPAD");
+    assignNoPropagation(toggleFullScreen, SCREEN, "end");
 }
 
 function hello() {

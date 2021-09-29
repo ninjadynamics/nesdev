@@ -1,20 +1,5 @@
 var isMenuOpen;
 
-function mainMenu() {
-    const upload = "uploadROM()";
-    const save = "saveState();";
-    const load = "loadState();";
-    const reset = "reset();"
-    const about = "showCredits()";
-    return createMenu(null,
-        link("Load ROM", js=upload, hide=SINGLE_ROM),
-        link("Save State", js=save),
-        link("Load State", js=load),
-        link("Reset", js=reset),
-        link("About", js=about)
-    );
-}
-
 function loadState() {
     const hash = sha256(emulator.getROMData());
     const data = localStorage.getItem(hash);
@@ -84,42 +69,50 @@ function uploadROM() {
     }
 }
 
+function allowUserInteraction(ontap=null) {
+    allowInteraction("pauseScreenContent");
+    assignNoPropagation(ontap, "OSD", ontap && "end");
+}
+
+function preventUserInteraction(ontap=null) {
+    assign(null, "pauseScreenContent");
+    assignNoPropagation(ontap, "OSD", ontap && "end");
+}
+
 function showError(msg) {
     $("#pauseScreenContent").html(
         html("div", "error", msg)
     );
-    assign(preventDefault, "pauseScreenContent");
-    assign(showMainMenu, "OSD", "end");
+    preventUserInteraction(returnToMainMenu);
 }
 
 function showCredits() {
-    let link = "https://twitter.com/ninjadynamics";
     $("#pauseScreenContent").html(
-        html(
-            "div", "about",
-            `Follow me on Twitter:<br/>
-            <a href="${link}" target="_blank">
-            <font color="yellow">ninjadynamics</font>
-            </a>
-            `
-        )
+        html("div", "about", ABOUT)
     );
+    allowUserInteraction(returnToMainMenu)
 }
 
-function showMainMenu() {
-    $("#pauseScreenContent").html(
-        mainMenu()
+function mainMenu() {
+    const upload = "uploadROM()";
+    const save = "saveState();";
+    const load = "loadState();";
+    const reset = "reset();"
+    const about = "showCredits()";
+    return createMenu(null,
+        link("Load ROM", js=upload, hide=SINGLE_ROM),
+        link("Save State", js=save),
+        link("Load State", js=load),
+        link("Reset", js=reset),
+        link("About", js=about)
     );
-    allowInteraction("pauseScreenContent");
-    assign(preventDefault, "OSD");
 }
 
 function openMainMenu() {
     pauseEmulation(
         html("span", "pauseScreenContent", mainMenu())
     );
-    allowInteraction("pauseScreenContent");
-    assign(preventDefault, "OSD");
+    allowUserInteraction();
     isMenuOpen = true;
 }
 
@@ -130,4 +123,12 @@ function toggleMenu() {
         return;
     }
     openMainMenu();
+}
+
+function returnToMainMenu(event) {
+    event.stopPropagation();
+    $("#pauseScreenContent").html(
+        mainMenu()
+    );
+    allowUserInteraction();
 }
