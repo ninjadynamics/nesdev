@@ -223,6 +223,6 @@ function menu(event) {
 // Doesn't work on iOS
 function toggleFullScreen(event) {
     event.preventDefault();
-    let element = document.getElementById("main");
+    let element = document.getElementById("ninjaPad");
     isFullScreen() ? exitFullScreen() : enterFullscreen(element);
 }

@@ -84,7 +84,7 @@ function assign(fn, elementName, ...touchEvents) {
     let element = document.getElementById(elementName);
     for (const e of TOUCH_EVENTS) {
         eval("element.ontouch" + e + " = preventDefault");
-        eval("element.ontouch" + e + " = stopPropagation");
+        //eval("element.ontouch" + e + " = stopPropagation");
     }
     // Assign function call to events
     for (const e of touchEvents) {

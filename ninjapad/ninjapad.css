@@ -1,13 +1,57 @@
-/* #ninjaPad {
-    position: absolute;
-    width: 100%;
-    display: none;
-} */
+#ninjaPad {
+    background-color: #222;
+    height: 100%;
+}
 
 #GAMEPAD {
     position: absolute;
     width: 100%;
     display: none;
+}
+
+#OSD {
+    position: absolute;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+    font-family: KarmaticArcade;
+    font-size: 5vmin;
+    box-sizing: border-box;
+    padding: 2em;
+    word-spacing: 0.5em;
+    color: red;
+    visibility: hidden;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* unvisited link */
+#OSD a:link {
+  color: red;
+  text-decoration: none;
+}
+
+/* visited link */
+#OSD a:visited {
+  color: red;
+  text-decoration: none;
+}
+
+/* mouse over link */
+#OSD a:hover {
+   color: red;
+   text-decoration: none;
+}
+
+/* selected link */
+#OSD a:active {
+   color: yellow;
+   text-decoration: none;
+}
+
+#DEADZONE {
+    background: #444;
 }
 
 .dirButtons {
@@ -183,51 +227,6 @@
     background-color: #BBB;
     border: 1vw;
     border-style: outset;
-}
-
-#OSD {
-    position: fixed;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    flex-direction: column;
-    font-family: KarmaticArcade;
-    font-size: 5vmin;
-    box-sizing: border-box;
-    padding: 2em;
-    word-spacing: 0.5em;
-    color: red;
-    visibility: hidden;
-    background-color: rgba(0, 0, 0, 0.8);
-}
-
-/* unvisited link */
-#OSD a:link {
-  color: red;
-  text-decoration: none;
-}
-
-/* visited link */
-#OSD a:visited {
-  color: red;
-  text-decoration: none;
-}
-
-/* mouse over link */
-#OSD a:hover {
-   color: red;
-   text-decoration: none;
-}
-
-/* selected link */
-#OSD a:active {
-   color: yellow;
-   text-decoration: none;
-}
-
-#DEADZONE {
-    background: #444;
 }
 
 @font-face {

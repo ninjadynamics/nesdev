@@ -27,7 +27,11 @@ function loadNinjaPad() {
     assign(analogSwitch, "analogSwitch", "start", "end");
     assign(buttonPress, "GAMEPAD-BUTTONS", "start", "move", "end");
     assign(analogTouch, "ANALOG_STICK", "start", "move", "end");
-    assign(preventDefault, "ninjaPad");
+    assign(null, "GAMEPAD");    
+}
+
+function hello() {
+    console.log("hello!")
 }
 
 $(document).ready(function() {

@@ -1,13 +1,25 @@
+// function setOSDLayout() {
+//     let rect = jQElement.screen[0].getBoundingClientRect();
+//     jQElement.osd.empty();
+//     jQElement.osd.detach().appendTo("#SCREEN");
+//     jQElement.osd.css("top", rect.top);
+//     jQElement.osd.css("left", rect.left);
+//     jQElement.osd.css("height", jQElement.screen.height());
+//     jQElement.osd.css("width", jQElement.screen.width());
+//     jQElement.osd.css("visibility", pauseScreen.visibility);
+//     jQElement.osd.append(pauseScreen.content);
+// }
+
 function setOSDLayout() {
-    let rect = jQElement.screen[0].getBoundingClientRect();
     jQElement.osd.empty();
-    jQElement.osd.css("top", rect.top);
-    jQElement.osd.css("left", rect.left);
+    jQElement.osd.detach().appendTo(jQElement.screen);
+    jQElement.osd.css("top", 0);
+    jQElement.osd.css("left", 0);
     jQElement.osd.css("height", jQElement.screen.height());
     jQElement.osd.css("width", jQElement.screen.width());
     jQElement.osd.css("visibility", pauseScreen.visibility);
     jQElement.osd.append(pauseScreen.content);
-    jQElement.osd.detach().appendTo("#SCREEN");
+    assign(null, "OSD");
 }
 
 function setDesktopLayout(width, height) {
@@ -29,6 +41,7 @@ function setDesktopLayout(width, height) {
 function setMobileLayout(width, height) {
     DEBUG && console.log("Mobile mode");
     jQElement.screen.detach().appendTo("#SCREEN");
+    $("body *").not("#ninjaPad *").not("#ninjaPad").remove();
     if (height >= width || window.matchMedia("(orientation: portrait)").matches) {
         let opacity = 1;
         let bottom = "auto";
@@ -66,14 +79,11 @@ function setMobileLayout(width, height) {
 }
 
 function setPageLayout() {
-    //$("#main").not("#emu-screen").not("#emu-screen *").remove();
-    //$("body *").not("#emu-screen").not("#emu-screen *").not("#ninjaPad *").not("#ninjaPad").hide(); $("body").css("background-color", "#222");
-    //console.log($("body *").not("#emu-screen *").not("#emu-screen").not("#ninjaPad *").not("#ninjaPad"))
-    let useJQuery = !isFullScreen() || isIOSDevice();
+    let useJQuery = false; //!isFullScreen() || isIOSDevice();
     let w = useJQuery ? $(window).width() : window.innerWidth; // window.screen.availWidth;
     let h = useJQuery ? $(window).height() : window.innerHeight; // window.screen.availHeight;
-    //isMobileDevice() ? setMobileLayout(w, h) : setDesktopLayout(w, h);
-    setMobileLayout(w, h);
+    isMobileDevice() ? setMobileLayout(w, h) : setDesktopLayout(w, h);
+    //setMobileLayout(w, h);
     setOSDLayout();
 }
 
