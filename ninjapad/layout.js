@@ -1,15 +1,3 @@
-// function setOSDLayout() {
-//     let rect = jQElement.screen[0].getBoundingClientRect();
-//     jQElement.osd.empty();
-//     jQElement.osd.detach().appendTo("#SCREEN");
-//     jQElement.osd.css("top", rect.top);
-//     jQElement.osd.css("left", rect.left);
-//     jQElement.osd.css("height", jQElement.screen.height());
-//     jQElement.osd.css("width", jQElement.screen.width());
-//     jQElement.osd.css("visibility", pauseScreen.visibility);
-//     jQElement.osd.append(pauseScreen.content);
-// }
-
 function setOSDLayout() {
     jQElement.osd.empty();
     jQElement.osd.detach().appendTo(jQElement.screen);
@@ -21,8 +9,13 @@ function setOSDLayout() {
     jQElement.osd.append(pauseScreen.content);
 }
 
-function setDesktopLayout(width, height) {
+function setDesktopLayout() {
     DEBUG && console.log("Desktop mode");
+
+    let useJQuery = !isFullScreen() || isIOSDevice();
+    let width = useJQuery ? $(window).width() : window.innerWidth;
+    let height = useJQuery ? $(window).height() : window.innerHeight;
+
     if (width > height) {
         jQElement.screen.height("100%");
         let newHeight = jQElement.screen.height();
@@ -37,10 +30,15 @@ function setDesktopLayout(width, height) {
     jQElement.controller.hide();
 }
 
-function setMobileLayout(width, height) {
+function setMobileLayout() {
     DEBUG && console.log("Mobile mode");
     jQElement.screen.detach().appendTo("#SCREEN");
     $("body *").not("#ninjaPad *").not("#ninjaPad").remove();
+
+    let useJQuery = !isFullScreen() || isIOSDevice();
+    let width = useJQuery ? $(window).width() : window.innerWidth;
+    let height = useJQuery ? $(window).height() : window.innerHeight;
+
     if (height >= width || window.matchMedia("(orientation: portrait)").matches) {
         let opacity = 1;
         let bottom = "auto";
@@ -71,18 +69,14 @@ function setMobileLayout(width, height) {
         DEBUG && console.log("Show touch controls");
     }
     else {
-        setDesktopLayout(width, height);
+        setDesktopLayout();
         handleLandscapeMode();
         DEBUG && console.log("Hide touch controls");
     }
 }
 
 function setPageLayout() {
-    let useJQuery = false; //!isFullScreen() || isIOSDevice();
-    let w = useJQuery ? $(window).width() : window.innerWidth; // window.screen.availWidth;
-    let h = useJQuery ? $(window).height() : window.innerHeight; // window.screen.availHeight;
-    isMobileDevice() ? setMobileLayout(w, h) : setDesktopLayout(w, h);
-    //setMobileLayout(w, h);
+    isMobileDevice() ? setMobileLayout() : setDesktopLayout();
     setOSDLayout();
 }
 

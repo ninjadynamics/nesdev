@@ -30,10 +30,6 @@ function loadNinjaPad() {
     assignNoPropagation(toggleFullScreen, SCREEN, "end");
 }
 
-function hello() {
-    console.log("hello!")
-}
-
 $(document).ready(function() {
     DEBUG && console.log("Document ready event");
 
