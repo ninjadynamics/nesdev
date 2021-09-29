@@ -106,7 +106,6 @@ function assignNoPropagation(fn, elementName, ...touchEvents) {
     for (const e of touchEvents) {
         eval("element.ontouch" + e + " = fn");
     }
-    console.log("yeah")
 }
 
 function allowInteraction(elementName) {
