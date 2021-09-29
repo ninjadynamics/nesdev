@@ -143,3 +143,16 @@ function equal (buf1, buf2)
     }
     return result;
 }
+
+function vw(v) {
+    let w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+    return (v * w) / 100;
+}
+
+function dist(dx, dy) {
+    return Math.sqrt((dx * dx) + (dy * dy));
+}
+
+function angle(dx, dy) {
+    return Math.atan2(dy, dx);
+}

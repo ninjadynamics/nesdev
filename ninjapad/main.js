@@ -19,15 +19,15 @@ function loadNinjaPad() {
     };
 
     // Page setup
-    setPageLayout();
+    layout.setPageLayout();
 
     // Assign function calls to touch events
-    assign(menu, "menu", "start", "end");
-    assign(analogSwitch, "analogSwitch", "start", "end");
-    assign(buttonPress, "GAMEPAD-BUTTONS", "start", "move", "end");
-    assign(analogTouch, "ANALOG_STICK", "start", "move", "end");
+    assign(gamepad.toggleMenu, "menu", "start", "end");
+    assign(gamepad.analogSwitch, "analogSwitch", "start", "end");
+    assign(gamepad.buttonPress, "GAMEPAD-BUTTONS", "start", "move", "end");
+    assign(gamepad.analogTouch, "ANALOG_STICK", "start", "move", "end");
+    assign(gamepad.toggleFullScreen, SCREEN, "end");
     assign(null, "GAMEPAD");
-    assign(toggleFullScreen, SCREEN, "end");
 }
 
 $(document).ready(function() {
@@ -48,7 +48,7 @@ $(document).ready(function() {
       if (e.code == "Escape") toggleMenu();
     });
 
-    emulator = INTERFACE[EMULATOR];
+    emulator = interface[EMULATOR];
     emulator.initialize("main.nes");
     loadNinjaPad();
 });

@@ -1,6 +1,5 @@
-const INTERFACE = {
+const interface = {
     jsnes: function() {
-
         const BUTTON_A = 0;
         const BUTTON_B = 2;
 
@@ -20,7 +19,7 @@ const INTERFACE = {
         var audio_samples_R = new Float32Array(SAMPLE_COUNT);
         var audio_write_cursor = 0, audio_read_cursor = 0;
 
-        var nes = new jsnes.NES({
+        const nes = new jsnes.NES({
             onFrame: function(framebuffer_24){
                 for(var i = 0; i < FRAMEBUFFER_SIZE; i++) framebuffer_u32[i] = 0xFF000000 | framebuffer_24[i];
             },
@@ -166,7 +165,9 @@ const INTERFACE = {
         document.addEventListener('keyup', (event) => {keyboard(nes.buttonUp, event)});
 
         return {
-            core: nes,
+            core: function() { 
+                return nes;
+            }(),
 
             buttonDown: function(b) {
                 nes.buttonDown(1, eval("jsnes.Controller." + b));
