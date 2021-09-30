@@ -10,6 +10,14 @@ ninjapad.layout = function() {
         ninjapad.jQElement.osd.append(ninjapad.pause.pauseScreen.content);
     }
 
+    function setEmulationScreenLayout() {
+        ninjapad.jQElement.screen.removeAttr("style");
+        ninjapad.jQElement.screen.css("width", ninjapad.emulator.display.width);
+        ninjapad.jQElement.screen.css("height", ninjapad.emulator.display.height);
+        ninjapad.jQElement.screen.css("margin", "auto");
+        ninjapad.jQElement.screen.css("position", "relative");
+    }
+
     function setDesktopLayout() {
         DEBUG && console.log("Desktop mode");
 
@@ -33,6 +41,11 @@ ninjapad.layout = function() {
 
     function setMobileLayout() {
         DEBUG && console.log("Mobile mode");
+
+        $("#ninjaPad").css("height", "100%");
+        $("body").removeAttr("style").css("margin", "0%");
+        setEmulationScreenLayout();
+
         ninjapad.jQElement.screen.detach().appendTo("#SCREEN");
         $("body *").not("#ninjaPad *").not("#ninjaPad").remove();
 

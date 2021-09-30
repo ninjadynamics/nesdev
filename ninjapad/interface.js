@@ -165,6 +165,11 @@ ninjapad.interface = {
         document.addEventListener('keyup', (event) => {keyboard(nes.buttonUp, event)});
 
         return {
+            display: {
+                width: 256,
+                height: 240
+            },
+
             core: function() {
                 return nes;
             }(),

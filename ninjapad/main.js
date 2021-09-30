@@ -29,6 +29,9 @@ ninjapad.initialize = function() {
 $(document).ready(function() {
     DEBUG && console.log("Document ready event");
 
+    // Load emulator
+    ninjapad.emulator = ninjapad.interface[EMULATOR];
+
     // Pause on loss of focus
     $(window).blur(function() {
         !ninjapad.pause.state.isEmulationPaused &&
@@ -42,11 +45,12 @@ $(document).ready(function() {
         ninjapad.initialize();
     });
 
+    // Use ESC key to open the menu
     $(window).keyup(function(e) {
       if (e.code == "Escape") ninjapad.menu.toggleMenu();
     });
 
-    ninjapad.emulator = ninjapad.interface[EMULATOR];
+    // Load a ROM and setup the page layout
     ninjapad.emulator.initialize("main.nes");
     ninjapad.initialize();
 });
