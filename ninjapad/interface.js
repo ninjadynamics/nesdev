@@ -127,7 +127,8 @@ ninjapad.interface = {
             script_processor = audio_ctx.createScriptProcessor(AUDIO_BUFFERING, 0, 2);
             script_processor.onaudioprocess = audio_callback;
             script_processor.connect(audio_ctx.destination);
-            document.addEventListener('touchstart',  () => { audio_ctx.resume() });
+            document.addEventListener('touchstart',       () => { audio_ctx.resume() });
+            document.addEventListener('keydown',          () => { audio_ctx.resume() });
         }
 
         function nes_boot(rom_data){
@@ -260,6 +261,7 @@ ninjapad.interface = {
 
                     if (pressed)
                     {
+                        if (audio_ctx) audio_ctx.resume();
                         var callback = nes.buttonDown;
                         switch(i)
                         {
