@@ -1,4 +1,6 @@
 ninjapad.layout = function() {
+    var coldStart = true;
+
     function setOSDLayout() {
         ninjapad.jQElement.osd.empty();
         ninjapad.jQElement.osd.detach().appendTo(ninjapad.jQElement.screen);
@@ -42,12 +44,15 @@ ninjapad.layout = function() {
     function setMobileLayout() {
         DEBUG && console.log("Mobile mode");
 
-        $("#ninjaPad").css("height", "100%");
-        $("body").removeAttr("style").css("margin", "0%");
-        setEmulationScreenLayout();
-
-        ninjapad.jQElement.screen.detach().appendTo("#SCREEN");
-        $("body *").not("#ninjaPad *").not("#ninjaPad").remove();
+        if (coldStart) {
+            DEBUG && console.log("Cold start");
+            $("#ninjaPad").css("height", "100%");
+            $("body").removeAttr("style").css("margin", "0%");
+            setEmulationScreenLayout();
+            ninjapad.jQElement.screen.detach().appendTo("#SCREEN");
+            $("body *").not("#ninjaPad *").not("#ninjaPad").remove();
+            coldStart = false;
+        }
 
         let useJQuery = !ninjapad.utils.isFullScreen() || ninjapad.utils.isIOSDevice();
         let width = useJQuery ? $(window).width() : window.innerWidth;
