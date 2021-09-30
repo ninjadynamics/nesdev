@@ -131,7 +131,7 @@ ninjapad.utils = function() {
         equal: function(buf1, buf2) {
             var result = true;
             if (buf1.byteLength != buf2.byteLength) {
-                console.log("size", buf1.byteLength, buf2.byteLength);
+                DEBUG && console.log("size", buf1.byteLength, buf2.byteLength);
                 return false;
             }
             var dv1 = new Int8Array(buf1);
@@ -140,7 +140,7 @@ ninjapad.utils = function() {
             {
                 if (dv1[i] != dv2[i]) {
                     result = false;
-                    console.log(i, dv1[i], dv2[i]);
+                    DEBUG && console.log(i, dv1[i], dv2[i]);
                 }
             }
             return result;

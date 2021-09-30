@@ -1,4 +1,3 @@
-const ninjapad = {};
 const DEBUG = true;
 const SINGLE_ROM = false;
 const DISPLAY = "emu-canvas";
