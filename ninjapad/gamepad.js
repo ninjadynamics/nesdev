@@ -67,8 +67,8 @@ const gamepad = function() {
                         analog.deltaX = touch.clientX - analog.touchX;
                         analog.deltaY = touch.clientY - analog.touchY;
 
-                        let r = angle(analog.deltaX, analog.deltaY);
-                        let d = Math.min(vw(10), dist(analog.deltaX, analog.deltaY));
+                        let r = utils.angle(analog.deltaX, analog.deltaY);
+                        let d = Math.min(utils.vw(10), utils.dist(analog.deltaX, analog.deltaY));
 
                         let dx = Math.cos(r) * d;
                         let dy = Math.sin(r) * d;
@@ -78,7 +78,7 @@ const gamepad = function() {
                         );
                         let btnIndex = Math.floor(((180 + (45/2) + (r * 180 / Math.PI)) % 360) / 45);
                         analog.padBtn && pressButtons(emulator.buttonUp, analog.padBtn);
-                        analog.padBtn = d < vw(DEADZONE) ? null : DPAD_BUTTONS[btnIndex];
+                        analog.padBtn = d < utils.vw(DEADZONE) ? null : DPAD_BUTTONS[btnIndex];
                         analog.padBtn && pressButtons(emulator.buttonDown, analog.padBtn);
                         break;
 
@@ -213,7 +213,7 @@ const gamepad = function() {
         toggleFullScreen: function(event) {
             event.preventDefault();
             let element = document.getElementById("ninjaPad");
-            isFullScreen() ? exitFullScreen() : enterFullscreen(element);
+            utils.isFullScreen() ? utils.exitFullScreen() : utils.enterFullscreen(element);
         },
     }
 }();

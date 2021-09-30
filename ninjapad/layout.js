@@ -6,14 +6,14 @@ const layout = function() {
         jQElement.osd.css("left", 0);
         jQElement.osd.css("height", jQElement.screen.height());
         jQElement.osd.css("width", jQElement.screen.width());
-        jQElement.osd.css("visibility", pauseScreen.visibility);
-        jQElement.osd.append(pauseScreen.content);
+        jQElement.osd.css("visibility", pause.pauseScreen.visibility);
+        jQElement.osd.append(pause.pauseScreen.content);
     }
 
     function setDesktopLayout() {
         DEBUG && console.log("Desktop mode");
 
-        let useJQuery = !isFullScreen() || isIOSDevice();
+        let useJQuery = !utils.isFullScreen() || utils.isIOSDevice();
         let width = useJQuery ? $(window).width() : window.innerWidth;
         let height = useJQuery ? $(window).height() : window.innerHeight;
 
@@ -36,7 +36,7 @@ const layout = function() {
         jQElement.screen.detach().appendTo("#SCREEN");
         $("body *").not("#ninjaPad *").not("#ninjaPad").remove();
 
-        let useJQuery = !isFullScreen() || isIOSDevice();
+        let useJQuery = !utils.isFullScreen() || utils.isIOSDevice();
         let width = useJQuery ? $(window).width() : window.innerWidth;
         let height = useJQuery ? $(window).height() : window.innerHeight;
 
@@ -48,7 +48,7 @@ const layout = function() {
             let newWidth = jQElement.screen.width();
             jQElement.screen.height(240 * (newWidth / 256));
 
-            let padHeight = vw(47.5);
+            let padHeight = utils.vw(47.5);
             let remainingHeight = height - jQElement.screen.height();
             jQElement.gamepad.height(Math.max(padHeight, remainingHeight));
 
@@ -63,9 +63,9 @@ const layout = function() {
             jQElement.controller.css("opacity", opacity);
             jQElement.controller.show();
 
-            if (cannotResume) {
-                cannotResume = false;
-                pauseEmulation();
+            if (pause.state.cannotResume) {
+                pause.state.cannotResume = false;
+                pause.pauseEmulation();
             }
             DEBUG && console.log("Show touch controls");
         }
@@ -77,8 +77,8 @@ const layout = function() {
     }
 
     function handleLandscapeMode() {
-        cannotResume = true;
-        pauseEmulation(
+        pause.state.cannotResume = true;
+        pause.pauseEmulation(
             html(
                 "span", "pauseScreenContent",
                 `Landscape mode<br/>
@@ -92,7 +92,7 @@ const layout = function() {
 
     return {
         setPageLayout: function() {
-            isMobileDevice() ? setMobileLayout() : setDesktopLayout();
+            utils.isMobileDevice() ? setMobileLayout() : setDesktopLayout();
             setOSDLayout();
         }
     };

@@ -165,7 +165,7 @@ const interface = {
         document.addEventListener('keyup', (event) => {keyboard(nes.buttonUp, event)});
 
         return {
-            core: function() { 
+            core: function() {
                 return nes;
             }(),
 
@@ -225,11 +225,11 @@ const interface = {
             saveState: function() {
                 const o = nes.toJSON();
                 const s = JSON.stringify(o);
-                return zip(s);
+                return utils.zip(s);
             },
 
             loadState: function(z) {
-                const s = unzip(z);
+                const s = utils.unzip(z);
                 const o = JSON.parse(s);
                 nes.fromJSON(o);
             },

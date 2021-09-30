@@ -1,19 +1,19 @@
 const menu = function() {
-    var isMenuOpen;
+    var state = { isOpen: false };
 
     function allowUserInteraction(ontap=null) {
-        allowInteraction("pauseScreenContent");
-        assignNoPropagation(ontap, "OSD", ontap && "end");
+        utils.allowInteraction("pauseScreenContent");
+        utils.assignNoPropagation(ontap, "OSD", ontap && "end");
     }
 
     function preventUserInteraction(ontap=null) {
-        assign(null, "pauseScreenContent");
-        assignNoPropagation(ontap, "OSD", ontap && "end");
+        utils.assign(null, "pauseScreenContent");
+        utils.assignNoPropagation(ontap, "OSD", ontap && "end");
     }
 
     function showError(msg) {
         $("#pauseScreenContent").html(
-            html("div", "error", msg)
+            utils.html("div", "error", msg)
         );
         preventUserInteraction(returnToMainMenu);
     }
@@ -24,21 +24,21 @@ const menu = function() {
         const load = "menu.loadState();";
         const reset = "menu.reset();"
         const about = "menu.showCredits()";
-        return createMenu(null,
-            link("Load ROM", js=upload, hide=SINGLE_ROM),
-            link("Save State", js=save),
-            link("Load State", js=load),
-            link("Reset", js=reset),
-            link("About", js=about)
+        return utils.createMenu(null,
+            utils.link("Load ROM", js=upload, hide=SINGLE_ROM),
+            utils.link("Save State", js=save),
+            utils.link("Load State", js=load),
+            utils.link("Reset", js=reset),
+            utils.link("About", js=about)
         );
     }
 
     function openMainMenu() {
-        pauseEmulation(
-            html("span", "pauseScreenContent", mainMenu())
+        pause.pauseEmulation(
+            utils.html("span", "pauseScreenContent", mainMenu())
         );
         allowUserInteraction();
-        isMenuOpen = true;
+        state.isOpen = true;
     }
 
     function returnToMainMenu(event) {
@@ -50,9 +50,7 @@ const menu = function() {
     }
 
     return {
-        isOpen: function(isOpen) {
-            isMenuOpen = isOpen;
-        },
+        state: state,
 
         loadState: function() {
             const hash = sha256(emulator.getROMData());
@@ -65,7 +63,7 @@ const menu = function() {
                 emulator.loadState(
                     uint8ToUtf16.decode(data)
                 );
-                resumeEmulation();
+                pause.resumeEmulation();
             }
             catch (e) {
                 showError(`Error<br/><br/>${e.message}`);
@@ -79,7 +77,7 @@ const menu = function() {
             try {
                 const optimizedData = uint8ToUtf16.encode(data);
                 localStorage.setItem(hash, optimizedData);
-                resumeEmulation();
+                pause.resumeEmulation();
             }
             catch (e) {
                 showError(`Error<br/><br/>${e.message}`);
@@ -89,7 +87,7 @@ const menu = function() {
 
         reset: function() {
             emulator.reloadROM();
-            resumeEmulation();
+            pause.resumeEmulation();
         },
 
         uploadROM: function() {
@@ -108,7 +106,7 @@ const menu = function() {
                 reader.onload = function () {
                     try {
                         emulator.loadROMData(reader.result);
-                        resumeEmulation();
+                        pause.resumeEmulation();
                     }
                     catch (e) {
                         if (saveData) {
@@ -125,15 +123,15 @@ const menu = function() {
 
         showCredits: function() {
             $("#pauseScreenContent").html(
-                html("div", "about", ABOUT)
+                utils.html("div", "about", ABOUT)
             );
             allowUserInteraction(returnToMainMenu)
         },
 
         toggleMenu: function() {
-            if (!cannotResume && isMenuOpen) {
-                resumeEmulation();
-                isMenuOpen = false;
+            if (!pause.state.cannotResume && state.isOpen) {
+                pause.resumeEmulation();
+                state.isOpen = false;
                 return;
             }
             openMainMenu();

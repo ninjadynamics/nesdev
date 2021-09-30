@@ -1,158 +1,162 @@
-const TOUCH_EVENTS = ["start", "move", "end"];
+const utils = function() {
+    const TOUCH_EVENTS = ["start", "move", "end"];
 
-Number.prototype.mod = function(n) {
-    return ((this%n)+n)%n;
-};
+    Number.prototype.mod = function(n) {
+        return ((this%n)+n)%n;
+    };
 
-String.prototype.strip = function (string) {
-    var escaped = string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
-    return this.replace(RegExp("^[" + escaped + "]+|[" + escaped + "]+$", "gm"), '');
-};
+    String.prototype.strip = function (string) {
+        var escaped = string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+        return this.replace(RegExp("^[" + escaped + "]+|[" + escaped + "]+$", "gm"), '');
+    };
 
-function preventDefaultWithoutPropagation(event) {
-    event.preventDefault();
-    event.stopPropagation();
-}
+    return {
 
-function preventDefault(event) {
-    event.preventDefault();
-}
+        preventDefaultWithoutPropagation: function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+        },
 
-function stopPropagation(event) {
-    event.stopPropagation();
-}
+        preventDefault: function(event) {
+            event.preventDefault();
+        },
 
-function isIOSDevice(){
-   return !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
-}
+        stopPropagation: function(event) {
+            event.stopPropagation();
+        },
 
-function isMobileDevice() {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-}
+        isIOSDevice: function(){
+            return !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
+        },
 
-function isFullScreen() {
-    return (
-        document.fullscreenElement ||
-        document.mozFullScreenElement ||
-        document.webkitFullscreenElement
-    );
-}
+        isMobileDevice: function() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        },
 
-function enterFullscreen(element) {
-    if (element.requestFullScreen) {
-         element.requestFullScreen();
-    } else if (element.webkitRequestFullScreen) {
-         element.webkitRequestFullScreen();
-    } else if (element.mozRequestFullScreen) {
-         element.mozRequestFullScreen();
-    } else if (element.msRequestFullscreen) {
-         element.msRequestFullscreen();
-    } else if (element.webkitEnterFullscreen) {
-        element.webkitEnterFullscreen(); //for iphone this code worked
-    }
-}
+        isFullScreen: function() {
+            return (
+                document.fullscreenElement ||
+                document.mozFullScreenElement ||
+                document.webkitFullscreenElement
+            );
+        },
 
-function exitFullScreen() {
-    if (document.cancelFullScreen) {
-        document.cancelFullScreen();
-    } else if (document.mozCancelFullScreen) {
-        document.mozCancelFullScreen();
-    } else if (document.webkitCancelFullScreen) {
-        document.webkitCancelFullScreen();
-    } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
-    }
-}
+        enterFullscreen: function(element) {
+            if (element.requestFullScreen) {
+                 element.requestFullScreen();
+            } else if (element.webkitRequestFullScreen) {
+                 element.webkitRequestFullScreen();
+            } else if (element.mozRequestFullScreen) {
+                 element.mozRequestFullScreen();
+            } else if (element.msRequestFullscreen) {
+                 element.msRequestFullscreen();
+            } else if (element.webkitEnterFullscreen) {
+                element.webkitEnterFullscreen(); //for iphone this code worked
+            }
+        },
 
-function html(obj, id, text) {
-    return `<${obj} id='${id}'>${text}</${obj}>`;
-}
+        exitFullScreen: function() {
+            if (document.cancelFullScreen) {
+                document.cancelFullScreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.webkitCancelFullScreen) {
+                document.webkitCancelFullScreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        },
 
-function link(content, js, hide) {
-    js = `${js}; return false;`;
-    return hide || `<a href="#" onclick="${js}">${content}</a>`;
-}
+        html: function(obj, id, text) {
+            return `<${obj} id='${id}'>${text}</${obj}>`;
+        },
 
-function createMenu(title, ...opts) {
-    opts = opts.filter(e => e !== true);
-    title = title ? `${title}<br/>` : "";
-    return (
-        `<div style="line-height: 2.2em;">
-            ${title}
-            ${opts.join("<br/>")}
-        </div>`
-    );
-}
+        link: function(content, js, hide) {
+            js = `${js}; return false;`;
+            return hide || `<a href="#" onclick="${js}">${content}</a>`;
+        },
 
-function assign(fn, elementName, ...touchEvents) {
-    // Prevent default on all events
-    let element = document.getElementById(elementName);
-    for (const e of TOUCH_EVENTS) {
-        eval("element.ontouch" + e + " = preventDefault");
-    }
-    // Assign function call to events
-    for (const e of touchEvents) {
-        eval("element.ontouch" + e + " = fn");
-    }
-}
+        createMenu: function(title, ...opts) {
+            opts = opts.filter(e => e !== true);
+            title = title ? `${title}<br/>` : "";
+            return (
+                `<div style="line-height: 2.2em;">
+                    ${title}
+                    ${opts.join("<br/>")}
+                </div>`
+            );
+        },
 
-function assignNoPropagation(fn, elementName, ...touchEvents) {
-    // Prevent default and stop propagation on all events
-    let element = document.getElementById(elementName);
-    for (const e of TOUCH_EVENTS) {
-        eval("element.ontouch" + e + " = preventDefaultWithoutPropagation");
-    }
-    // Assign function call to events
-    for (const e of touchEvents) {
-        eval("element.ontouch" + e + " = fn");
-    }
-}
+        assign: function(fn, elementName, ...touchEvents) {
+            // Prevent default on all events
+            let element = document.getElementById(elementName);
+            for (const e of TOUCH_EVENTS) {
+                eval("element.ontouch" + e + " = utils.preventDefault");
+            }
+            // Assign function call to events
+            for (const e of touchEvents) {
+                eval("element.ontouch" + e + " = fn");
+            }
+        },
 
-function allowInteraction(elementName) {
-    let element = document.getElementById(elementName);
-    for (const e of TOUCH_EVENTS) {
-        eval("element.ontouch" + e + " = stopPropagation");
-    }
-}
+        assignNoPropagation: function(fn, elementName, ...touchEvents) {
+            // Prevent default and stop propagation on all events
+            let element = document.getElementById(elementName);
+            for (const e of TOUCH_EVENTS) {
+                eval("element.ontouch" + e + " = utils.preventDefaultWithoutPropagation");
+            }
+            // Assign function call to events
+            for (const e of touchEvents) {
+                eval("element.ontouch" + e + " = fn");
+            }
+        },
 
-function zip(data) {
-    const buf = fflate.strToU8(data);
-    return fflate.compressSync(buf, { level: 9, mem: 8 });
-}
+        allowInteraction: function(elementName) {
+            let element = document.getElementById(elementName);
+            for (const e of TOUCH_EVENTS) {
+                eval("element.ontouch" + e + " = utils.stopPropagation");
+            }
+        },
 
-function unzip(data) {
-    const decompressed = fflate.decompressSync(data);
-    return fflate.strFromU8(decompressed);
-}
+        zip: function(data) {
+            const buf = fflate.strToU8(data);
+            return fflate.compressSync(buf, { level: 9, mem: 8 });
+        },
 
-function equal (buf1, buf2)
-{
-    var result = true;
-    if (buf1.byteLength != buf2.byteLength) {
-        console.log("size", buf1.byteLength, buf2.byteLength);
-        return false;
-    }
-    var dv1 = new Int8Array(buf1);
-    var dv2 = new Int8Array(buf2);
-    for (var i = 0 ; i != buf1.byteLength ; i++)
-    {
-        if (dv1[i] != dv2[i]) {
-            result = false;
-            console.log(i, dv1[i], dv2[i]);
+        unzip: function(data) {
+            const decompressed = fflate.decompressSync(data);
+            return fflate.strFromU8(decompressed);
+        },
+
+        equal: function(buf1, buf2) {
+            var result = true;
+            if (buf1.byteLength != buf2.byteLength) {
+                console.log("size", buf1.byteLength, buf2.byteLength);
+                return false;
+            }
+            var dv1 = new Int8Array(buf1);
+            var dv2 = new Int8Array(buf2);
+            for (var i = 0 ; i != buf1.byteLength ; i++)
+            {
+                if (dv1[i] != dv2[i]) {
+                    result = false;
+                    console.log(i, dv1[i], dv2[i]);
+                }
+            }
+            return result;
+        },
+
+        vw: function(v) {
+            let w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+            return (v * w) / 100;
+        },
+
+        dist: function(dx, dy) {
+            return Math.sqrt((dx * dx) + (dy * dy));
+        },
+
+        angle: function(dx, dy) {
+            return Math.atan2(dy, dx);
         }
     }
-    return result;
-}
-
-function vw(v) {
-    let w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-    return (v * w) / 100;
-}
-
-function dist(dx, dy) {
-    return Math.sqrt((dx * dx) + (dy * dy));
-}
-
-function angle(dx, dy) {
-    return Math.atan2(dy, dx);
-}
+}();

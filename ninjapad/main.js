@@ -22,12 +22,12 @@ function loadNinjaPad() {
     layout.setPageLayout();
 
     // Assign function calls to touch events
-    assign(gamepad.toggleMenu, "menu", "start", "end");
-    assign(gamepad.analogSwitch, "analogSwitch", "start", "end");
-    assign(gamepad.buttonPress, "GAMEPAD-BUTTONS", "start", "move", "end");
-    assign(gamepad.analogTouch, "ANALOG_STICK", "start", "move", "end");
-    assign(gamepad.toggleFullScreen, SCREEN, "end");
-    assign(null, "GAMEPAD");
+    utils.assign(gamepad.toggleMenu, "menu", "start", "end");
+    utils.assign(gamepad.analogSwitch, "analogSwitch", "start", "end");
+    utils.assign(gamepad.buttonPress, "GAMEPAD-BUTTONS", "start", "move", "end");
+    utils.assign(gamepad.analogTouch, "ANALOG_STICK", "start", "move", "end");
+    utils.assign(gamepad.toggleFullScreen, SCREEN, "end");
+    utils.assign(null, "GAMEPAD");
 }
 
 $(document).ready(function() {
@@ -35,7 +35,7 @@ $(document).ready(function() {
 
     // Pause on loss of focus
     $(window).blur(function() {
-        !isEmulationPaused && isMobileDevice() && pauseEmulation();
+        !pause.state.isEmulationPaused && utils.isMobileDevice() && pause.pauseEmulation();
     });
 
     // Reload layout on orientation change
