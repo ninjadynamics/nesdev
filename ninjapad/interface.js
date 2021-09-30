@@ -1,4 +1,4 @@
-const interface = {
+ninjapad.interface = {
     jsnes: function() {
         const BUTTON_A = 0;
         const BUTTON_B = 2;
@@ -225,11 +225,11 @@ const interface = {
             saveState: function() {
                 const o = nes.toJSON();
                 const s = JSON.stringify(o);
-                return utils.zip(s);
+                return ninjapad.utils.zip(s);
             },
 
             loadState: function(z) {
-                const s = utils.unzip(z);
+                const s = ninjapad.utils.unzip(z);
                 const o = JSON.parse(s);
                 nes.fromJSON(o);
             },
@@ -245,4 +245,4 @@ const interface = {
             // ...
         };
     }()
-}
+};

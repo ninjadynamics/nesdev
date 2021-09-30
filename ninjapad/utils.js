@@ -1,4 +1,4 @@
-const utils = function() {
+ninjapad.utils = function() {
     const TOUCH_EVENTS = ["start", "move", "end"];
 
     Number.prototype.mod = function(n) {
@@ -91,7 +91,7 @@ const utils = function() {
             // Prevent default on all events
             let element = document.getElementById(elementName);
             for (const e of TOUCH_EVENTS) {
-                eval("element.ontouch" + e + " = utils.preventDefault");
+                eval("element.ontouch" + e + " = ninjapad.utils.preventDefault");
             }
             // Assign function call to events
             for (const e of touchEvents) {
@@ -103,7 +103,7 @@ const utils = function() {
             // Prevent default and stop propagation on all events
             let element = document.getElementById(elementName);
             for (const e of TOUCH_EVENTS) {
-                eval("element.ontouch" + e + " = utils.preventDefaultWithoutPropagation");
+                eval("element.ontouch" + e + " = ninjapad.utils.preventDefaultWithoutPropagation");
             }
             // Assign function call to events
             for (const e of touchEvents) {
@@ -114,7 +114,7 @@ const utils = function() {
         allowInteraction: function(elementName) {
             let element = document.getElementById(elementName);
             for (const e of TOUCH_EVENTS) {
-                eval("element.ontouch" + e + " = utils.stopPropagation");
+                eval("element.ontouch" + e + " = ninjapad.utils.stopPropagation");
             }
         },
 

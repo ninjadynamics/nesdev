@@ -1,11 +1,7 @@
-// jQuery Objects
-var jQElement;
-
-// Emulator interface
-var emulator;
-
-function loadNinjaPad() {
-    jQElement = {
+ninjapad.emulator = null;
+ninjapad.jQElement = null;
+ninjapad.initialize = function() {
+    ninjapad.jQElement = {
         gamepad:        $("#GAMEPAD"),
         controller:     $("#GAMEPAD-BUTTONS"),
         analogSwitch:   $("#analogSwitch"),
@@ -19,36 +15,38 @@ function loadNinjaPad() {
     };
 
     // Page setup
-    layout.setPageLayout();
+    ninjapad.layout.setPageLayout();
 
     // Assign function calls to touch events
-    utils.assign(gamepad.toggleMenu, "menu", "start", "end");
-    utils.assign(gamepad.analogSwitch, "analogSwitch", "start", "end");
-    utils.assign(gamepad.buttonPress, "GAMEPAD-BUTTONS", "start", "move", "end");
-    utils.assign(gamepad.analogTouch, "ANALOG_STICK", "start", "move", "end");
-    utils.assign(gamepad.toggleFullScreen, SCREEN, "end");
-    utils.assign(null, "GAMEPAD");
-}
+    ninjapad.utils.assign(ninjapad.gamepad.toggleMenu, "menu", "start", "end");
+    ninjapad.utils.assign(ninjapad.gamepad.analogSwitch, "analogSwitch", "start", "end");
+    ninjapad.utils.assign(ninjapad.gamepad.buttonPress, "GAMEPAD-BUTTONS", "start", "move", "end");
+    ninjapad.utils.assign(ninjapad.gamepad.analogTouch, "ANALOG_STICK", "start", "move", "end");
+    ninjapad.utils.assign(ninjapad.gamepad.toggleFullScreen, SCREEN, "end");
+    ninjapad.utils.assign(null, "GAMEPAD");
+};
 
 $(document).ready(function() {
     DEBUG && console.log("Document ready event");
 
     // Pause on loss of focus
     $(window).blur(function() {
-        !pause.state.isEmulationPaused && utils.isMobileDevice() && pause.pauseEmulation();
+        !ninjapad.pause.state.isEmulationPaused &&
+        ninjapad.utils.isMobileDevice() &&
+        ninjapad.pause.pauseEmulation();
     });
 
     // Reload layout on orientation change
     $(window).resize(function() {
         DEBUG && console.log("Window resize event");
-        loadNinjaPad();
+        ninjapad.initialize();
     });
 
     $(window).keyup(function(e) {
-      if (e.code == "Escape") toggleMenu();
+      if (e.code == "Escape") ninjapad.menu.toggleMenu();
     });
 
-    emulator = interface[EMULATOR];
-    emulator.initialize("main.nes");
-    loadNinjaPad();
+    ninjapad.emulator = ninjapad.interface[EMULATOR];
+    ninjapad.emulator.initialize("main.nes");
+    ninjapad.initialize();
 });

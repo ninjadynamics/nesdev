@@ -1,4 +1,4 @@
-const gamepad = function() {
+ninjapad.gamepad = function() {
     // Handle single-touch multiple button presses
     const MULTIPRESS = {
         "UR": ["BUTTON_UP",   "BUTTON_RIGHT"],
@@ -37,7 +37,7 @@ const gamepad = function() {
     }
 
     function fnButtonPress(eventType) {
-        return isButtonDown(eventType) ? emulator.buttonDown : emulator.buttonUp;
+        return isButtonDown(eventType) ? ninjapad.emulator.buttonDown : ninjapad.emulator.buttonUp;
     }
 
     function pressButtons(fn, buttons) {
@@ -67,24 +67,24 @@ const gamepad = function() {
                         analog.deltaX = touch.clientX - analog.touchX;
                         analog.deltaY = touch.clientY - analog.touchY;
 
-                        let r = utils.angle(analog.deltaX, analog.deltaY);
-                        let d = Math.min(utils.vw(10), utils.dist(analog.deltaX, analog.deltaY));
+                        let r = ninjapad.utils.angle(analog.deltaX, analog.deltaY);
+                        let d = Math.min(ninjapad.utils.vw(10), ninjapad.utils.dist(analog.deltaX, analog.deltaY));
 
                         let dx = Math.cos(r) * d;
                         let dy = Math.sin(r) * d;
-                        jQElement.analogStick.css(
+                        ninjapad.jQElement.analogStick.css(
                             "transform",
                             "translate(" + dx + "px, " + dy + "px)"
                         );
                         let btnIndex = Math.floor(((180 + (45/2) + (r * 180 / Math.PI)) % 360) / 45);
-                        analog.padBtn && pressButtons(emulator.buttonUp, analog.padBtn);
-                        analog.padBtn = d < utils.vw(DEADZONE) ? null : DPAD_BUTTONS[btnIndex];
-                        analog.padBtn && pressButtons(emulator.buttonDown, analog.padBtn);
+                        analog.padBtn && pressButtons(ninjapad.emulator.buttonUp, analog.padBtn);
+                        analog.padBtn = d < ninjapad.utils.vw(DEADZONE) ? null : DPAD_BUTTONS[btnIndex];
+                        analog.padBtn && pressButtons(ninjapad.emulator.buttonDown, analog.padBtn);
                         break;
 
                     default:
-                        analog.padBtn && pressButtons(emulator.buttonUp, analog.padBtn);
-                        analogReset(jQElement.analogStick);
+                        analog.padBtn && pressButtons(ninjapad.emulator.buttonUp, analog.padBtn);
+                        analogReset(ninjapad.jQElement.analogStick);
                 }
             }
         },
@@ -120,7 +120,7 @@ const gamepad = function() {
                     // If the user was actually pressing a button before
                     if (lastButton.id.startsWith("BUTTON")) {
                         // Tell the emulator to release that button
-                        emulator.buttonUp(lastButton.id);
+                        ninjapad.emulator.buttonUp(lastButton.id);
                         $(lastButton).css("border-style", "outset");
                         DEBUG && console.log("Released", lastButton.id); // Debug
                     }
@@ -129,7 +129,7 @@ const gamepad = function() {
                         // Get buttons
                         let key = lastButton.id.split("_").pop();
                         for (const d of MULTIPRESS[key]) {
-                            emulator.buttonUp(d);
+                            ninjapad.emulator.buttonUp(d);
                         }
                         $(lastButton).css("background-color", "transparent");
                         DEBUG && console.log("Released", lastButton.id); // Debug
@@ -182,38 +182,38 @@ const gamepad = function() {
         analogSwitch: function(event) {
             event.preventDefault();
             if (event.type == "touchstart") {
-                jQElement.analogSwitch.css("border-style", "inset");
+                ninjapad.jQElement.analogSwitch.css("border-style", "inset");
                 return;
             }
-            jQElement.analogSwitch.css("border-style", "outset");
+            ninjapad.jQElement.analogSwitch.css("border-style", "outset");
 
-            if (jQElement.analog.css("display") == "none") {
+            if (ninjapad.jQElement.analog.css("display") == "none") {
                 analog.active = true;
-                jQElement.dpad.hide();
-                jQElement.analog.show();
-                analogReset(jQElement.analog);
+                ninjapad.jQElement.dpad.hide();
+                ninjapad.jQElement.analog.show();
+                analogReset(ninjapad.jQElement.analog);
                 return;
             }
             analog.active = false;
-            jQElement.analog.hide();
-            jQElement.dpad.show();
+            ninjapad.jQElement.analog.hide();
+            ninjapad.jQElement.dpad.show();
         },
 
         toggleMenu: function(event) {
             event.preventDefault();
             if (event.type == "touchstart") {
-                jQElement.menu.css("border-style", "inset");
+                ninjapad.jQElement.menu.css("border-style", "inset");
                 return;
             }
-            jQElement.menu.css("border-style", "outset");
-            menu.toggleMenu();
+            ninjapad.jQElement.menu.css("border-style", "outset");
+            ninjapad.menu.toggleMenu();
         },
 
         // Doesn't work on iOS
         toggleFullScreen: function(event) {
             event.preventDefault();
             let element = document.getElementById("ninjaPad");
-            utils.isFullScreen() ? utils.exitFullScreen() : utils.enterFullscreen(element);
+            ninjapad.utils.isFullScreen() ? ninjapad.utils.exitFullScreen() : ninjapad.utils.enterFullscreen(element);
         },
     }
 }();

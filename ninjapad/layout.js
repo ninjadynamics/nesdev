@@ -1,42 +1,42 @@
-const layout = function() {
+ninjapad.layout = function() {
     function setOSDLayout() {
-        jQElement.osd.empty();
-        jQElement.osd.detach().appendTo(jQElement.screen);
-        jQElement.osd.css("top", 0);
-        jQElement.osd.css("left", 0);
-        jQElement.osd.css("height", jQElement.screen.height());
-        jQElement.osd.css("width", jQElement.screen.width());
-        jQElement.osd.css("visibility", pause.pauseScreen.visibility);
-        jQElement.osd.append(pause.pauseScreen.content);
+        ninjapad.jQElement.osd.empty();
+        ninjapad.jQElement.osd.detach().appendTo(ninjapad.jQElement.screen);
+        ninjapad.jQElement.osd.css("top", 0);
+        ninjapad.jQElement.osd.css("left", 0);
+        ninjapad.jQElement.osd.css("height", ninjapad.jQElement.screen.height());
+        ninjapad.jQElement.osd.css("width", ninjapad.jQElement.screen.width());
+        ninjapad.jQElement.osd.css("visibility", ninjapad.pause.pauseScreen.visibility);
+        ninjapad.jQElement.osd.append(ninjapad.pause.pauseScreen.content);
     }
 
     function setDesktopLayout() {
         DEBUG && console.log("Desktop mode");
 
-        let useJQuery = !utils.isFullScreen() || utils.isIOSDevice();
+        let useJQuery = !ninjapad.utils.isFullScreen() || ninjapad.utils.isIOSDevice();
         let width = useJQuery ? $(window).width() : window.innerWidth;
         let height = useJQuery ? $(window).height() : window.innerHeight;
 
         if (width > height) {
-            jQElement.screen.height("100%");
-            let newHeight = jQElement.screen.height();
-            jQElement.screen.width(256 * (newHeight / 240));
+            ninjapad.jQElement.screen.height("100%");
+            let newHeight = ninjapad.jQElement.screen.height();
+            ninjapad.jQElement.screen.width(256 * (newHeight / 240));
         }
         else {
-            jQElement.screen.width("100%");
-            let newWidth = jQElement.screen.width();
-            jQElement.screen.height(240 * (newWidth / 256));
+            ninjapad.jQElement.screen.width("100%");
+            let newWidth = ninjapad.jQElement.screen.width();
+            ninjapad.jQElement.screen.height(240 * (newWidth / 256));
         }
-        jQElement.gamepad.height("0%");
-        jQElement.controller.hide();
+        ninjapad.jQElement.gamepad.height("0%");
+        ninjapad.jQElement.controller.hide();
     }
 
     function setMobileLayout() {
         DEBUG && console.log("Mobile mode");
-        jQElement.screen.detach().appendTo("#SCREEN");
+        ninjapad.jQElement.screen.detach().appendTo("#SCREEN");
         $("body *").not("#ninjaPad *").not("#ninjaPad").remove();
 
-        let useJQuery = !utils.isFullScreen() || utils.isIOSDevice();
+        let useJQuery = !ninjapad.utils.isFullScreen() || ninjapad.utils.isIOSDevice();
         let width = useJQuery ? $(window).width() : window.innerWidth;
         let height = useJQuery ? $(window).height() : window.innerHeight;
 
@@ -44,28 +44,28 @@ const layout = function() {
             let opacity = 1;
             let bottom = "auto";
 
-            jQElement.screen.width("100%");
-            let newWidth = jQElement.screen.width();
-            jQElement.screen.height(240 * (newWidth / 256));
+            ninjapad.jQElement.screen.width("100%");
+            let newWidth = ninjapad.jQElement.screen.width();
+            ninjapad.jQElement.screen.height(240 * (newWidth / 256));
 
-            let padHeight = utils.vw(47.5);
-            let remainingHeight = height - jQElement.screen.height();
-            jQElement.gamepad.height(Math.max(padHeight, remainingHeight));
+            let padHeight = ninjapad.utils.vw(47.5);
+            let remainingHeight = height - ninjapad.jQElement.screen.height();
+            ninjapad.jQElement.gamepad.height(Math.max(padHeight, remainingHeight));
 
             let difference = remainingHeight - padHeight;
             if (difference < 0) {
                 opacity += (difference / (padHeight * 2));
                 bottom = 0;
             }
-            jQElement.gamepad.css("bottom", bottom);
-            jQElement.gamepad.css("display", "block");
+            ninjapad.jQElement.gamepad.css("bottom", bottom);
+            ninjapad.jQElement.gamepad.css("display", "block");
 
-            jQElement.controller.css("opacity", opacity);
-            jQElement.controller.show();
+            ninjapad.jQElement.controller.css("opacity", opacity);
+            ninjapad.jQElement.controller.show();
 
-            if (pause.state.cannotResume) {
-                pause.state.cannotResume = false;
-                pause.pauseEmulation();
+            if (ninjapad.pause.state.cannotResume) {
+                ninjapad.pause.state.cannotResume = false;
+                ninjapad.pause.pauseEmulation();
             }
             DEBUG && console.log("Show touch controls");
         }
@@ -77,9 +77,9 @@ const layout = function() {
     }
 
     function handleLandscapeMode() {
-        pause.state.cannotResume = true;
-        pause.pauseEmulation(
-            html(
+        ninjapad.pause.state.cannotResume = true;
+        ninjapad.pause.pauseEmulation(
+            ninjapad.utils.html(
                 "span", "pauseScreenContent",
                 `Landscape mode<br/>
                 not supported yet<br/>
@@ -92,7 +92,7 @@ const layout = function() {
 
     return {
         setPageLayout: function() {
-            utils.isMobileDevice() ? setMobileLayout() : setDesktopLayout();
+            ninjapad.utils.isMobileDevice() ? setMobileLayout() : setDesktopLayout();
             setOSDLayout();
         }
     };
