@@ -51,6 +51,6 @@ $(document).ready(function() {
     });
 
     // Load a ROM and setup the page layout
-    ninjapad.emulator.initialize("main.nes");
+    ninjapad.emulator.initialize();
     ninjapad.initialize();
 });
