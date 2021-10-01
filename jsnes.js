@@ -3639,8 +3639,8 @@ NES.prototype = {
   break: false,
 
   // Set break to true to stop frame loop.
-  stop: function() {
-   this.break = true;
+  stop: function () {
+    this.break = true;
   },
 
   // Resets the system
@@ -3667,7 +3667,7 @@ NES.prototype = {
     var ppu = this.ppu;
     var papu = this.papu;
     FRAMELOOP: for (;;) {
-      if(this.break) break;
+      if (this.break) break;
       if (cpu.cyclesToHalt === 0) {
         // Execute a CPU instruction
         cycles = cpu.emulate();
@@ -4792,7 +4792,7 @@ ChannelDM.prototype = {
     "reg4013",
     "sample",
     "dacLsb",
-    "data"
+    "data",
   ],
 
   toJSON: function () {
@@ -4948,7 +4948,7 @@ ChannelNoise.prototype = {
     "sampleValue",
     "accValue",
     "accCount",
-    "tmp"
+    "tmp",
   ],
 
   toJSON: function () {

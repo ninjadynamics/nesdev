@@ -1,37 +1,48 @@
-// Pause screen
-var isEmulationPaused = false;
-var cannotResume = false;
-var pauseScreen = {
-    visibility: "hidden",
-    content: ""
-};
+ninjapad.pause = function() {
+    var state = {
+        isEmulationPaused: false,
+        cannotResume: false
+    };
 
-function pauseText() {
-    let msg = "Emulation paused";
-    let resumeMsg = isMobileDevice() ? "Tap" : "Click";
-    resumeMsg += " to resume";
-    return html("span", "pauseScreenContent", msg + "<br/>" + resumeMsg);
-}
+    var pauseScreen = {
+        visibility: "hidden",
+        content: ""
+    };
 
-function pauseEmulation(content=null) {
-    emulator.pause();
-    pauseScreen.visibility = "visible";
-    pauseScreen.content = content || pauseText();
-    jQElement.osd.empty();
-    jQElement.osd.append(pauseScreen.content);
-    jQElement.osd.css("visibility", pauseScreen.visibility);
-    assign(preventDefault, "pauseScreenContent");
-    assign(resumeEmulation, "OSD", "end");
-    isEmulationPaused = true;
-    DEBUG && console.log("Emulation paused");
-}
+    function pauseText() {
+        let msg = "Emulation paused";
+        let resumeMsg = ninjapad.utils.isMobileDevice() ? "Tap" : "Click";
+        resumeMsg += " to resume";
+        return ninjapad.utils.html("span", "pauseScreenContent", msg + "<br/>" + resumeMsg);
+    }
 
-function resumeEmulation() {
-    if (cannotResume) return;
-    emulator.resume();
-    pauseScreen.visibility = "hidden";
-    jQElement.osd.css("visibility", pauseScreen.visibility);
-    isEmulationPaused = false;
-    isMenuOpen = false;
-    DEBUG && console.log("Emulation resumed");
-}
+    return {
+        state: state,
+
+        pauseScreen: pauseScreen,
+
+        pauseEmulation: function(content=null) {
+            ninjapad.emulator.pause();
+            pauseScreen.visibility = "visible";
+            pauseScreen.content = content || pauseText();
+            ninjapad.jQElement.osd.empty();
+            ninjapad.jQElement.osd.append(pauseScreen.content);
+            ninjapad.jQElement.osd.css("visibility", pauseScreen.visibility);
+            state.isEmulationPaused = true;
+            ninjapad.utils.assign(null, "pauseScreenContent");
+            ninjapad.utils.assignNoPropagation(ninjapad.pause.resumeEmulation, "OSD", "end");
+            DEBUG && console.log("Emulation paused");
+        },
+
+        resumeEmulation: function(event) {
+            if (event) event.stopPropagation();
+            if (state.cannotResume) return;
+            ninjapad.emulator.resume();
+            pauseScreen.visibility = "hidden";
+            ninjapad.jQElement.osd.css("visibility", pauseScreen.visibility);
+            state.isEmulationPaused = false;
+            ninjapad.menu.state.isOpen = false;
+            DEBUG && console.log("Emulation resumed");
+        }
+    };
+}();

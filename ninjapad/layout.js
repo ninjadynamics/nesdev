@@ -1,77 +1,117 @@
-function setOSDLayout() {
-    let rect = jQElement.screen[0].getBoundingClientRect();
-    jQElement.osd.empty();
-    jQElement.osd.css("top", rect.top);
-    jQElement.osd.css("left", rect.left);
-    jQElement.osd.css("height", jQElement.screen.height());
-    jQElement.osd.css("width", jQElement.screen.width());
-    jQElement.osd.css("visibility", pauseScreen.visibility);
-    jQElement.osd.append(pauseScreen.content);
-}
+ninjapad.layout = function() {
+    var coldStart = true;
 
-function setDesktopLayout() {
-    jQElement.screen.height("100%");
-    let newHeight = jQElement.screen.height();
-    jQElement.screen.width(256 * (newHeight / 240));
-    jQElement.ninjaPad.height("0%");
-    jQElement.controller.hide();
-}
-
-function setMobileLayout(height) {
-    let opacity = 1;
-    let bottom = "auto";
-
-    jQElement.screen.width("100%");
-    let newWidth = jQElement.screen.width();
-    jQElement.screen.height(240 * (newWidth / 256));
-
-    let padHeight = vw(47.5);
-    let remainingHeight = height - jQElement.screen.height();
-    jQElement.ninjaPad.height(Math.max(padHeight, remainingHeight));
-
-    let difference = remainingHeight - padHeight;
-    if (difference < 0) {
-        opacity += (difference / (padHeight * 2));
-        bottom = 0;
+    function setOSDLayout() {
+        ninjapad.jQElement.osd.empty();
+        ninjapad.jQElement.osd.detach().appendTo(ninjapad.jQElement.screen);
+        ninjapad.jQElement.osd.css("top", 0);
+        ninjapad.jQElement.osd.css("left", 0);
+        ninjapad.jQElement.osd.css("height", ninjapad.jQElement.screen.height());
+        ninjapad.jQElement.osd.css("width", ninjapad.jQElement.screen.width());
+        ninjapad.jQElement.osd.css("visibility", ninjapad.pause.pauseScreen.visibility);
+        ninjapad.jQElement.osd.append(ninjapad.pause.pauseScreen.content);
     }
-    jQElement.ninjaPad.css("bottom", bottom);
-    jQElement.ninjaPad.css("display", "block");
 
-    jQElement.controller.css("opacity", opacity);
-    jQElement.controller.show();
-
-    if (cannotResume) {
-        cannotResume = false;
-        pauseEmulation();
+    function setEmulationScreenLayout() {
+        ninjapad.jQElement.screen.removeAttr("style");
+        ninjapad.jQElement.screen.css("width", ninjapad.emulator.display.width);
+        ninjapad.jQElement.screen.css("height", ninjapad.emulator.display.height);
+        ninjapad.jQElement.screen.css("margin", "auto");
+        ninjapad.jQElement.screen.css("position", "relative");
     }
-}
 
-function setPageLayout() {
-    let useJQuery = !isFullScreen() || isIOSDevice();
-    let w = useJQuery ? $(window).width() : window.innerWidth; // window.screen.availWidth;
-    let h = useJQuery ? $(window).height() : window.innerHeight; // window.screen.availHeight;
-    if (h >= w || window.matchMedia("(orientation: portrait)").matches) {
-        DEBUG && console.log("Show touch controls");
-        setMobileLayout(h);
-    }
-    else {
-        setDesktopLayout();
-        if (isMobileDevice()) handleLandscapeMode();
-        DEBUG && console.log("Hide touch controls");
-    }
-    setOSDLayout();
-}
+    function setDesktopLayout() {
+        DEBUG && console.log("Desktop mode");
 
-function handleLandscapeMode() {
-    cannotResume = true;
-    pauseEmulation(
-        html(
-            "span", "pauseScreenContent",
-            `Landscape mode<br/>
-            not supported yet<br/>
-            <br/>
-            Turn your device<br/>
-            upright to play`
-        )
-    );
-}
+        let useJQuery = !ninjapad.utils.isFullScreen() || ninjapad.utils.isIOSDevice();
+        let width = useJQuery ? $(window).width() : window.innerWidth;
+        let height = useJQuery ? $(window).height() : window.innerHeight;
+
+        if (width > height) {
+            ninjapad.jQElement.screen.height("100%");
+            let newHeight = ninjapad.jQElement.screen.height();
+            ninjapad.jQElement.screen.width(256 * (newHeight / 240));
+        }
+        else {
+            ninjapad.jQElement.screen.width("100%");
+            let newWidth = ninjapad.jQElement.screen.width();
+            ninjapad.jQElement.screen.height(240 * (newWidth / 256));
+        }
+        ninjapad.jQElement.gamepad.height("0%");
+        ninjapad.jQElement.controller.hide();
+    }
+
+    function setMobileLayout() {
+        DEBUG && console.log("Mobile mode");
+
+        if (coldStart) {
+            DEBUG && console.log("Cold start");
+            $("#ninjaPad").css("height", "100%");
+            $("body").removeAttr("style").css("margin", "0%");
+            setEmulationScreenLayout();
+            ninjapad.jQElement.screen.detach().appendTo("#SCREEN");
+            $("body *").not("#ninjaPad *").not("#ninjaPad").remove();
+            coldStart = false;
+        }
+
+        let useJQuery = !ninjapad.utils.isFullScreen() || ninjapad.utils.isIOSDevice();
+        let width = useJQuery ? $(window).width() : window.innerWidth;
+        let height = useJQuery ? $(window).height() : window.innerHeight;
+
+        if (height >= width || window.matchMedia("(orientation: portrait)").matches) {
+            let opacity = 1;
+            let bottom = "auto";
+
+            ninjapad.jQElement.screen.width("100%");
+            let newWidth = ninjapad.jQElement.screen.width();
+            ninjapad.jQElement.screen.height(240 * (newWidth / 256));
+
+            let padHeight = ninjapad.utils.vw(47.5);
+            let remainingHeight = height - ninjapad.jQElement.screen.height();
+            ninjapad.jQElement.gamepad.height(Math.max(padHeight, remainingHeight));
+
+            let difference = remainingHeight - padHeight;
+            if (difference < 0) {
+                opacity += (difference / (padHeight * 2));
+                bottom = 0;
+            }
+            ninjapad.jQElement.gamepad.css("bottom", bottom);
+            ninjapad.jQElement.gamepad.css("display", "block");
+
+            ninjapad.jQElement.controller.css("opacity", opacity);
+            ninjapad.jQElement.controller.show();
+
+            if (ninjapad.pause.state.cannotResume) {
+                ninjapad.pause.state.cannotResume = false;
+                ninjapad.pause.pauseEmulation();
+            }
+            DEBUG && console.log("Show touch controls");
+        }
+        else {
+            setDesktopLayout();
+            handleLandscapeMode();
+            DEBUG && console.log("Hide touch controls");
+        }
+    }
+
+    function handleLandscapeMode() {
+        ninjapad.pause.state.cannotResume = true;
+        ninjapad.pause.pauseEmulation(
+            ninjapad.utils.html(
+                "span", "pauseScreenContent",
+                `Landscape mode<br/>
+                not supported yet<br/>
+                <br/>
+                Turn your device<br/>
+                upright to play`
+            )
+        );
+    }
+
+    return {
+        setPageLayout: function() {
+            ninjapad.utils.isMobileDevice() ? setMobileLayout() : setDesktopLayout();
+            setOSDLayout();
+        }
+    };
+}();

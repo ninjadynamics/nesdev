@@ -1,54 +1,56 @@
-// jQuery Objects
-var jQElement;
-
-// Emulator interface
-var emulator;
-
-function loadNinjaPad() {
-    jQElement = {
-        ninjaPad:     $("#ninjaPad"),
-        controller:   $("#CONTROLLER"),
-        analogSwitch: $("#analogSwitch"),
-        menu:         $("#menu"),
-        upload:       $("#upload"),
-        analogStick:  $("#ANALOG_STICK"),
-        analog:       $("#ANALOG"),
-        dpad:         $("#DPAD"),
-        osd:          $("#OSD"),
-        screen:       $("#" + SCREEN),
+ninjapad.emulator = null;
+ninjapad.jQElement = null;
+ninjapad.initialize = function() {
+    ninjapad.jQElement = {
+        gamepad:        $("#GAMEPAD"),
+        controller:     $("#GAMEPAD-BUTTONS"),
+        analogSwitch:   $("#analogSwitch"),
+        menu:           $("#menu"),
+        upload:         $("#upload"),
+        analogStick:    $("#ANALOG_STICK"),
+        analog:         $("#ANALOG"),
+        dpad:           $("#DPAD"),
+        osd:            $("#OSD"),
+        screen:         $("#" + SCREEN),
     };
 
     // Page setup
-    setPageLayout();
+    ninjapad.layout.setPageLayout();
 
     // Assign function calls to touch events
-    assign(toggleFullScreen, SCREEN, "end");
-    assign(menu, "menu", "start", "end");
-    assign(analogSwitch, "analogSwitch", "start", "end");
-    assign(buttonPress, "CONTROLLER", "start", "move", "end");
-    assign(analogTouch, "ANALOG_STICK", "start", "move", "end");
-    assign(preventDefault, "ninjaPad");
-}
+    ninjapad.utils.assign(ninjapad.gamepad.toggleMenu, "menu", "start", "end");
+    ninjapad.utils.assign(ninjapad.gamepad.analogSwitch, "analogSwitch", "start", "end");
+    ninjapad.utils.assign(ninjapad.gamepad.buttonPress, "GAMEPAD-BUTTONS", "start", "move", "end");
+    ninjapad.utils.assign(ninjapad.gamepad.analogTouch, "ANALOG_STICK", "start", "move", "end");
+    ninjapad.utils.assign(ninjapad.gamepad.toggleFullScreen, SCREEN, "end");
+    ninjapad.utils.assign(null, "GAMEPAD");
+};
 
 $(document).ready(function() {
     DEBUG && console.log("Document ready event");
 
+    // Load emulator
+    ninjapad.emulator = ninjapad.interface[EMULATOR];
+
     // Pause on loss of focus
     $(window).blur(function() {
-        !isEmulationPaused && isMobileDevice() && pauseEmulation();
+        !ninjapad.pause.state.isEmulationPaused &&
+        ninjapad.utils.isMobileDevice() &&
+        ninjapad.pause.pauseEmulation();
     });
 
     // Reload layout on orientation change
     $(window).resize(function() {
         DEBUG && console.log("Window resize event");
-        loadNinjaPad();
+        ninjapad.initialize();
     });
 
+    // Use ESC key to open the menu
     $(window).keyup(function(e) {
-      if (e.code == "Escape") toggleMenu();
+      if (e.code == "Escape") ninjapad.menu.toggleMenu();
     });
 
-    emulator = INTERFACE[EMULATOR];
-    emulator.initialize("main.nes");
-    loadNinjaPad();
+    // Load a ROM and setup the page layout
+    ninjapad.emulator.initialize();
+    ninjapad.initialize();
 });

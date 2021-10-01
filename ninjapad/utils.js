@@ -1,123 +1,162 @@
-const TOUCH_EVENTS = ["start", "move", "end"];
+ninjapad.utils = function() {
+    const TOUCH_EVENTS = ["start", "move", "end"];
 
-Number.prototype.mod = function(n) {
-    return ((this%n)+n)%n;
-};
+    Number.prototype.mod = function(n) {
+        return ((this%n)+n)%n;
+    };
 
-function preventDefault(event) {
-    event.preventDefault();
-}
+    String.prototype.strip = function (string) {
+        var escaped = string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+        return this.replace(RegExp("^[" + escaped + "]+|[" + escaped + "]+$", "gm"), '');
+    };
 
-function stopPropagation(event) {
-    event.stopPropagation();
-}
+    return {
 
-function isIOSDevice(){
-   return !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
-}
+        preventDefaultWithoutPropagation: function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+        },
 
-function isMobileDevice() {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-}
+        preventDefault: function(event) {
+            event.preventDefault();
+        },
 
-function isFullScreen() {
-    return (
-        document.fullscreenElement ||
-        document.mozFullScreenElement ||
-        document.webkitFullscreenElement
-    );
-}
+        stopPropagation: function(event) {
+            event.stopPropagation();
+        },
 
-function enterFullscreen(element) {
-    if (element.requestFullScreen) {
-         element.requestFullScreen();
-    } else if (element.webkitRequestFullScreen) {
-         element.webkitRequestFullScreen();
-    } else if (element.mozRequestFullScreen) {
-         element.mozRequestFullScreen();
-    } else if (element.msRequestFullscreen) {
-         element.msRequestFullscreen();
-    } else if (element.webkitEnterFullscreen) {
-        element.webkitEnterFullscreen(); //for iphone this code worked
-    }
-}
+        isIOSDevice: function(){
+            return !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
+        },
 
-function exitFullScreen() {
-    if (document.cancelFullScreen) {
-        document.cancelFullScreen();
-    } else if (document.mozCancelFullScreen) {
-        document.mozCancelFullScreen();
-    } else if (document.webkitCancelFullScreen) {
-        document.webkitCancelFullScreen();
-    } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
-    }
-}
+        isMobileDevice: function() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        },
 
-function html(obj, id, text) {
-    return `<${obj} id='${id}'>${text}</${obj}>`;
-}
+        isFullScreen: function() {
+            return (
+                document.fullscreenElement ||
+                document.mozFullScreenElement ||
+                document.webkitFullscreenElement
+            );
+        },
 
-function link(content, js, hide) {
-    js = `${js}; return false;`;
-    return hide || `<a href="#" onclick="${js}">${content}</a>`;
-}
+        enterFullscreen: function(element) {
+            if (element.requestFullScreen) {
+                 element.requestFullScreen();
+            } else if (element.webkitRequestFullScreen) {
+                 element.webkitRequestFullScreen();
+            } else if (element.mozRequestFullScreen) {
+                 element.mozRequestFullScreen();
+            } else if (element.msRequestFullscreen) {
+                 element.msRequestFullscreen();
+            } else if (element.webkitEnterFullscreen) {
+                element.webkitEnterFullscreen(); //for iphone this code worked
+            }
+        },
 
-function createMenu(title, ...opts) {
-    opts = opts.filter(e => e !== true);
-    title = title ? `${title}<br/>` : "";
-    return (
-        `<div style="line-height: 2.2em;">
-            ${title}
-            ${opts.join("<br/>")}
-        </div>`
-    );
-}
+        exitFullScreen: function() {
+            if (document.cancelFullScreen) {
+                document.cancelFullScreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.webkitCancelFullScreen) {
+                document.webkitCancelFullScreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        },
 
-function assign(fn, elementName, ...touchEvents) {
-    // Prevent default on all events
-    let element = document.getElementById(elementName);
-    for (const e of TOUCH_EVENTS) {
-        eval("element.ontouch" + e + " = preventDefault");
-    }
-    // Assign function call to events
-    for (const e of touchEvents) {
-        eval("element.ontouch" + e + " = fn");
-    }
-}
+        html: function(obj, id, text) {
+            return `<${obj} id='${id}'>${text}</${obj}>`;
+        },
 
-function allowInteraction(elementName) {
-    let element = document.getElementById(elementName);
-    for (const e of TOUCH_EVENTS) {
-        eval("element.ontouch" + e + " = stopPropagation");
-    }
-}
+        link: function(content, js, hide) {
+            js = `${js}; return false;`;
+            return hide || `<a href="#" onclick="${js}">${content}</a>`;
+        },
 
-function zip(data) {
-    const buf = fflate.strToU8(data);
-    return fflate.compressSync(buf, { level: 9, mem: 8 });
-}
+        createMenu: function(title, ...opts) {
+            opts = opts.filter(e => e !== true);
+            title = title ? `${title}<br/>` : "";
+            return (
+                `<div style="line-height: 2.2em;">
+                    ${title}
+                    ${opts.join("<br/>")}
+                </div>`
+            );
+        },
 
-function unzip(data) {
-    const decompressed = fflate.decompressSync(data);
-    return fflate.strFromU8(decompressed);
-}
+        assign: function(fn, elementName, ...touchEvents) {
+            // Prevent default on all events
+            let element = document.getElementById(elementName);
+            for (const e of TOUCH_EVENTS) {
+                eval("element.ontouch" + e + " = ninjapad.utils.preventDefault");
+            }
+            // Assign function call to events
+            for (const e of touchEvents) {
+                eval("element.ontouch" + e + " = fn");
+            }
+        },
 
-function equal (buf1, buf2)
-{
-    var result = true;
-    if (buf1.byteLength != buf2.byteLength) {
-        console.log("size", buf1.byteLength, buf2.byteLength);
-        return false;
-    }
-    var dv1 = new Int8Array(buf1);
-    var dv2 = new Int8Array(buf2);
-    for (var i = 0 ; i != buf1.byteLength ; i++)
-    {
-        if (dv1[i] != dv2[i]) {
-            result = false;
-            console.log(i, dv1[i], dv2[i]);
+        assignNoPropagation: function(fn, elementName, ...touchEvents) {
+            // Prevent default and stop propagation on all events
+            let element = document.getElementById(elementName);
+            for (const e of TOUCH_EVENTS) {
+                eval("element.ontouch" + e + " = ninjapad.utils.preventDefaultWithoutPropagation");
+            }
+            // Assign function call to events
+            for (const e of touchEvents) {
+                eval("element.ontouch" + e + " = fn");
+            }
+        },
+
+        allowInteraction: function(elementName) {
+            let element = document.getElementById(elementName);
+            for (const e of TOUCH_EVENTS) {
+                eval("element.ontouch" + e + " = ninjapad.utils.stopPropagation");
+            }
+        },
+
+        zip: function(data) {
+            const buf = fflate.strToU8(data);
+            return fflate.compressSync(buf, { level: 9, mem: 8 });
+        },
+
+        unzip: function(data) {
+            const decompressed = fflate.decompressSync(data);
+            return fflate.strFromU8(decompressed);
+        },
+
+        equal: function(buf1, buf2) {
+            var result = true;
+            if (buf1.byteLength != buf2.byteLength) {
+                DEBUG && console.log("size", buf1.byteLength, buf2.byteLength);
+                return false;
+            }
+            var dv1 = new Int8Array(buf1);
+            var dv2 = new Int8Array(buf2);
+            for (var i = 0 ; i != buf1.byteLength ; i++)
+            {
+                if (dv1[i] != dv2[i]) {
+                    result = false;
+                    DEBUG && console.log(i, dv1[i], dv2[i]);
+                }
+            }
+            return result;
+        },
+
+        vw: function(v) {
+            let w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+            return (v * w) / 100;
+        },
+
+        dist: function(dx, dy) {
+            return Math.sqrt((dx * dx) + (dy * dy));
+        },
+
+        angle: function(dx, dy) {
+            return Math.atan2(dy, dx);
         }
     }
-    return result;
-}
+}();
