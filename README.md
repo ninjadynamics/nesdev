@@ -1,4 +1,5 @@
-# Instructions
+# NinjaPad is still in development and it hasn't been released yet!  
+## Use at your own risk  
 
 ## Files and folders
 Add the folder **ninjapad/** to your project root  
