@@ -1,3 +1,6 @@
+// 2021 Ninja Dynamics
+// Creative Commons Attribution 4.0 International Public License
+
 ninjapad.gamepad = function() {
     // Handle single-touch multiple button presses
     const MULTIPRESS = {
@@ -122,7 +125,7 @@ ninjapad.gamepad = function() {
                         // Tell the emulator to release that button
                         ninjapad.emulator.buttonUp(lastButton.id);
                         $(lastButton).css("border-style", "outset");
-                        DEBUG && console.log("Released", lastButton.id); // Debug
+                        DEBUG && console.log("NinjaPad: Released", lastButton.id); // Debug
                     }
                     // Otherwise, if it was a multipress
                     else if (lastButton.id.startsWith("MULTI")) {
@@ -132,7 +135,7 @@ ninjapad.gamepad = function() {
                             ninjapad.emulator.buttonUp(d);
                         }
                         $(lastButton).css("background-color", "transparent");
-                        DEBUG && console.log("Released", lastButton.id); // Debug
+                        DEBUG && console.log("NinjaPad: Released", lastButton.id); // Debug
                     }
                     // Update the child button to be the one the user is touching right now
                     childButton[target.id] = element;
@@ -147,11 +150,11 @@ ninjapad.gamepad = function() {
                     // Show button presses / releases
                     if (isButtonDown(event.type)) {
                         $(element).css("border-style", "inset");
-                        DEBUG && console.log("Pressed", element.id); // Debug
+                        DEBUG && console.log("NinjaPad: Pressed", element.id); // Debug
                     }
                     else {
                         $(element).css("border-style", "outset");
-                        DEBUG && console.log("Released", element.id);  // Debug
+                        DEBUG && console.log("NinjaPad: Released", element.id);  // Debug
                     }
                 }
                 // Otherwise, if it's actually two buttons at the same time
@@ -169,11 +172,11 @@ ninjapad.gamepad = function() {
                     // Resume emulation and show button presses / releases
                     if (isButtonDown(event.type)) {
                         $(element).css("background-color", "#444");
-                        DEBUG && console.log("Pressed", element.id); // Debug
+                        DEBUG && console.log("NinjaPad: Pressed", element.id); // Debug
                     }
                     else {
                         $(element).css("background-color", "transparent");
-                        DEBUG && console.log("Released", element.id); // Debug
+                        DEBUG && console.log("NinjaPad: Released", element.id); // Debug
                     }
                 }
             }

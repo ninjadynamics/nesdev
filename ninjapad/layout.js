@@ -1,3 +1,6 @@
+// 2021 Ninja Dynamics
+// Creative Commons Attribution 4.0 International Public License
+
 ninjapad.layout = function() {
     var coldStart = true;
 
@@ -21,7 +24,7 @@ ninjapad.layout = function() {
     }
 
     function setDesktopLayout() {
-        DEBUG && console.log("Desktop mode");
+        DEBUG && console.log("NinjaPad: Desktop mode selected");
 
         let useJQuery = !ninjapad.utils.isFullScreen() || ninjapad.utils.isIOSDevice();
         let width = useJQuery ? $(window).width() : window.innerWidth;
@@ -42,10 +45,10 @@ ninjapad.layout = function() {
     }
 
     function setMobileLayout() {
-        DEBUG && console.log("Mobile mode");
+        DEBUG && console.log("NinjaPad: Mobile mode selected");
 
         if (coldStart) {
-            DEBUG && console.log("Cold start");
+            DEBUG && console.log("NinjaPad: Mobile mode: Cold start");
             $("#ninjaPad").css("height", "100%");
             $("body").removeAttr("style").css("margin", "0%");
             setEmulationScreenLayout();
@@ -85,12 +88,12 @@ ninjapad.layout = function() {
                 ninjapad.pause.state.cannotResume = false;
                 ninjapad.pause.pauseEmulation();
             }
-            DEBUG && console.log("Show touch controls");
+            DEBUG && console.log("NinjaPad: Touch controls enabled");
         }
         else {
             setDesktopLayout();
             handleLandscapeMode();
-            DEBUG && console.log("Hide touch controls");
+            DEBUG && console.log("NinjaPad: Touch controls disabled");
         }
     }
 

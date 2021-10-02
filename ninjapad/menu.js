@@ -1,3 +1,6 @@
+// 2021 Ninja Dynamics
+// Creative Commons Attribution 4.0 International Public License
+
 ninjapad.menu = function() {
     var state = { isOpen: false };
 

@@ -1,12 +1,6 @@
-# NinjaPad is still in development and it hasn't been released yet!  
-## Use at your own risk  
+# NES Platformer Demo - WIP
+I don't have a name for this game yet  
 
-## Files and folders
-Add the folder **ninjapad/** to your project root  
-Add the file **ninjapad-config.js** to your project root  
-
-## HTML
-Copy-paste the content of **ninjapad.html** into the end of your **\<body\>** metatag  
-
-## Config
-Edit the file **ninjapad-config.js** to your liking  
+# NinjaPad
+If you came here looking for NinjaPad, follow this link:
+https://www.github.com/ninjapad/  

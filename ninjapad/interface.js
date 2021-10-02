@@ -1,5 +1,11 @@
 ninjapad.interface = {
     jsnes: function() {
+        // This code is a modified port of the JSNES example:
+        // https://github.com/bfirsh/jsnes/tree/master/example
+
+        // Additional contributions by Matt Hughson
+        // https://twitter.com/matthughson
+
         const BUTTON_A = 0;
         const BUTTON_B = 2;
 
@@ -340,7 +346,8 @@ ninjapad.interface = {
          setInterval(scangamepads, 500);
         }
 
-
+        // If you wish to create your own interface,
+        // you need to provide the exact same keys
         return {
             display: {
                 width: 256,
