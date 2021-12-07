@@ -2,6 +2,9 @@
 // Creative Commons Attribution 4.0 International Public License
 
 ninjapad.gamepad = function() {
+    const PRESSED = true;
+    const RELEASED = false;
+
     // Handle single-touch multiple button presses
     const MULTIPRESS = {
         "UR": ["BUTTON_UP",   "BUTTON_RIGHT"],
@@ -33,6 +36,22 @@ ninjapad.gamepad = function() {
         deltaX: undefined,
         deltaY: undefined,
         padBtn: undefined
+    };
+
+    var buttonPresses = {
+        "BUTTON_UP": RELEASED,
+        "BUTTON_DOWN": RELEASED,
+        "BUTTON_LEFT": RELEASED,
+        "BUTTON_RIGHT": RELEASED,
+        "BUTTON_A": RELEASED,
+        "BUTTON_B": RELEASED,
+        "BUTTON_SELECT": RELEASED,
+        "BUTTON_START": RELEASED,
+        "MULTI_UR": RELEASED,
+        "MULTI_DR": RELEASED,
+        "MULTI_UL": RELEASED,
+        "MULTI_DL": RELEASED,
+        "MULTI_AB": RELEASED
     };
 
     function isButtonDown(eventType) {
@@ -71,7 +90,10 @@ ninjapad.gamepad = function() {
                         analog.deltaY = touch.clientY - analog.touchY;
 
                         let r = ninjapad.utils.angle(analog.deltaX, analog.deltaY);
-                        let d = Math.min(ninjapad.utils.vw(10), ninjapad.utils.dist(analog.deltaX, analog.deltaY));
+                        let d = Math.min(
+                            ninjapad.layout.analogStickMovementRadius,
+                            ninjapad.utils.dist(analog.deltaX, analog.deltaY)
+                        );
 
                         let dx = Math.cos(r) * d;
                         let dy = Math.sin(r) * d;
@@ -81,7 +103,7 @@ ninjapad.gamepad = function() {
                         );
                         let btnIndex = Math.floor(((180 + (45/2) + (r * 180 / Math.PI)) % 360) / 45);
                         analog.padBtn && pressButtons(ninjapad.emulator.buttonUp, analog.padBtn);
-                        analog.padBtn = d < ninjapad.utils.vw(DEADZONE) ? null : DPAD_BUTTONS[btnIndex];
+                        analog.padBtn = d < ninjapad.utils.vmin(DEADZONE) ? null : DPAD_BUTTONS[btnIndex];
                         analog.padBtn && pressButtons(ninjapad.emulator.buttonDown, analog.padBtn);
                         break;
 
@@ -98,6 +120,8 @@ ninjapad.gamepad = function() {
 
             // Get the source element
             target = event.target;
+
+            const bgcolor = "rgba(255, 255, 255, 0.03)"; // TODO: get it from boot
 
             // Handle the touch
             for (const touch of event.changedTouches) {
@@ -123,61 +147,67 @@ ninjapad.gamepad = function() {
                     // If the user was actually pressing a button before
                     if (lastButton.id.startsWith("BUTTON")) {
                         // Tell the emulator to release that button
-                        ninjapad.emulator.buttonUp(lastButton.id);
-                        $(lastButton).css("border-style", "outset");
-                        DEBUG && console.log("NinjaPad: Released", lastButton.id); // Debug
+                        if (buttonPresses[lastButton.id] == PRESSED) {
+                            ninjapad.emulator.buttonUp(lastButton.id);
+                            buttonPresses[lastButton.id] = RELEASED;
+                        }
                     }
                     // Otherwise, if it was a multipress
                     else if (lastButton.id.startsWith("MULTI")) {
                         // Get buttons
                         let key = lastButton.id.split("_").pop();
-                        for (const d of MULTIPRESS[key]) {
-                            ninjapad.emulator.buttonUp(d);
+                        for (const btn of MULTIPRESS[key]) {
+                            if (buttonPresses[btn] == RELEASED) continue;
+                            // - - - - - - - - - - - - - - - - - - - -
+                            ninjapad.emulator.buttonUp(btn);
+                            buttonPresses[btn] = RELEASED;
                         }
-                        $(lastButton).css("background-color", "transparent");
-                        DEBUG && console.log("NinjaPad: Released", lastButton.id); // Debug
+                        // Show button release (shadow button)
+                        if (buttonPresses[lastButton.id] == PRESSED) {
+                            $(lastButton).css(
+                                "background-color",
+                                lastButton.id == "MULTI_AB" ? bgcolor : "transparent"
+                            );
+                            DEBUG && console.log("NinjaPad: Released", lastButton.id); // Debug
+                            buttonPresses[lastButton.id] = RELEASED;
+                        }
                     }
                     // Update the child button to be the one the user is touching right now
                     childButton[target.id] = element;
                 }
 
-                // If the user is actually interacting a button right now
+                // If the user is interacting with a single button
+                let isPressed = isButtonDown(event.type);
+                let interactWith = fnButtonPress(event.type);
                 if (element.id.startsWith("BUTTON")) {
-
                     // Press / release that button
-                    fnButtonPress(event.type)(element.id);
-
-                    // Show button presses / releases
-                    if (isButtonDown(event.type)) {
-                        $(element).css("border-style", "inset");
-                        DEBUG && console.log("NinjaPad: Pressed", element.id); // Debug
-                    }
-                    else {
-                        $(element).css("border-style", "outset");
-                        DEBUG && console.log("NinjaPad: Released", element.id);  // Debug
+                    if (buttonPresses[element.id] != isPressed) {
+                        interactWith(element.id);
+                        buttonPresses[element.id] = isPressed;
                     }
                 }
-                // Otherwise, if it's actually two buttons at the same time
+                // Otherwise, if the interaction corresponds
+                // to two buttons at the same time
                 else if (element.id.startsWith("MULTI")) {
-
-                    // Get the correct function call
-                    let fn = fnButtonPress(event.type)
-
                     // Get buttons and press / release them
                     let key = element.id.split("_").pop();
-                    for (const d of MULTIPRESS[key]) {
-                        fn(d);
+                    for (const btn of MULTIPRESS[key]) {
+                        if (buttonPresses[btn] == isPressed) continue;
+                        // - - - - - - - - - - - - - - - - - - - - - -
+                        interactWith(btn);
+                        buttonPresses[btn] = isPressed;
                     }
-
-                    // Resume emulation and show button presses / releases
-                    if (isButtonDown(event.type)) {
-                        $(element).css("background-color", "#444");
-                        DEBUG && console.log("NinjaPad: Pressed", element.id); // Debug
-                    }
-                    else {
-                        $(element).css("background-color", "transparent");
-                        DEBUG && console.log("NinjaPad: Released", element.id); // Debug
-                    }
+                    // Show button press / release (shadow button)
+                    if (buttonPresses[element.id] == isPressed) continue;
+                    // - - - - - - - - - - - - - - - - - - - - - - - - - -
+                    $(element).css(
+                        "background-color",
+                        isPressed ? "#444" : (
+                            element.id == "MULTI_AB" ?  bgcolor : "transparent"
+                        )
+                    );
+                    DEBUG && console.log("NinjaPad:", isPressed ? "Pressed" : "Released", element.id);
+                    buttonPresses[element.id] = isPressed;
                 }
             }
         },
@@ -190,33 +220,40 @@ ninjapad.gamepad = function() {
             }
             ninjapad.jQElement.analogSwitch.css("border-style", "outset");
 
+            var color_off = ninjapad.utils.getCSSVar("#analogSwitch", "color");
+            var color_on = ninjapad.utils.getCSSVar("#analogSwitch", "color_on");
+
             if (ninjapad.jQElement.analog.css("display") == "none") {
                 analog.active = true;
                 ninjapad.jQElement.dpad.hide();
                 ninjapad.jQElement.analog.show();
                 analogReset(ninjapad.jQElement.analog);
+                ninjapad.utils.changeButtonColor("#analogSwitch", color_on, glow=true);
                 return;
             }
             analog.active = false;
             ninjapad.jQElement.analog.hide();
             ninjapad.jQElement.dpad.show();
+            ninjapad.utils.changeButtonColor("#analogSwitch", color_off);
         },
 
-        toggleMenu: function(event) {
+        toggleMainMenu: function(event) {
             event.preventDefault();
             if (event.type == "touchstart") {
                 ninjapad.jQElement.menu.css("border-style", "inset");
                 return;
             }
             ninjapad.jQElement.menu.css("border-style", "outset");
-            ninjapad.menu.toggleMenu();
+            ninjapad.menu.toggle.mainMenu();
         },
 
         // Doesn't work on iOS
         toggleFullScreen: function(event) {
             event.preventDefault();
             let element = document.getElementById("ninjaPad");
-            ninjapad.utils.isFullScreen() ? ninjapad.utils.exitFullScreen() : ninjapad.utils.enterFullscreen(element);
-        },
+            ninjapad.utils.isFullScreen() ?
+            ninjapad.utils.exitFullScreen() :
+            ninjapad.utils.enterFullscreen(element);
+        }
     }
 }();

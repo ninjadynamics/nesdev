@@ -2,7 +2,9 @@
 <div id="ninjaPad">
     <link rel="stylesheet" href="ninjapad/ninjapad.css">
     <div id="SCREEN">
-        <div id="OSD"></div>
+        <div id="OSD" class="noselect"></div>
+        <div id="REC_MENU" class="noselect"></div>
+        <div id="REC_STATUS" class="noselect"></div>
     </div>
     <div id="GAMEPAD">
         <div id="GAMEPAD-BUTTONS">
@@ -28,15 +30,17 @@
                 <div id="BUTTON_B" class="button_B"></div>
                 <div id="BUTTON_A" class="button_A"></div>
             </div>
-            <div id="FUNCTIONAL" class="middleButtons">
-                <div id="BUTTON_SELECT" class="button_SELECT"></div>
-                <div id="BUTTON_START" class="button_START"></div>
+            <div id="FUNCTIONAL-TR" class="functionalTL">
                 <div id="analogSwitch" class="analogSwitchButton"></div>
-                <div id="menu" class="menuButton">
-                    <input type="file" accept=".nes" id="upload" style="display:none"/>
-                </div>
+                <div id="BUTTON_SELECT" class="button_SELECT"></div>
+            </div>
+            <div id="FUNCTIONAL-BL" class="functionalBR">
+                <div id="BUTTON_START" class="button_START"></div>
+                <div id="menu" class="menuButton"></div>
             </div>
         </div>
     </div>
+    <input type="file" accept=".nes" id="uploadROM" style="display:none"/>
+    <input type="file" accept=".zip" id="uploadZIP" style="display:none"/>
 </div>
 <!-- End of NinjaPad -->

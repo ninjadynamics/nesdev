@@ -9,11 +9,19 @@ ninjapad.pause = function() {
         content: ""
     };
 
-    function pauseText() {
-        let msg = "Emulation paused";
-        let resumeMsg = ninjapad.utils.isMobileDevice() ? "Tap" : "Click";
-        resumeMsg += " to resume";
-        return ninjapad.utils.html("span", "pauseScreenContent", msg + "<br/>" + resumeMsg);
+    function pauseText(content, resumable) {
+        if (!content) {
+            let msg = "Emulation paused";
+            let resumeMsg = ninjapad.utils.isMobileDevice() ? "Tap" : "Click";
+            resumeMsg += " to resume";
+            content = "<span>" + msg + "<br/>" + resumeMsg + "</span>";
+            resumable = true;
+        }
+        if (resumable) {
+            ninjapad.utils.assignNoPropagation(ninjapad.pause.resumeEmulation, "OSD", "end");
+            ninjapad.utils.assignClick(ninjapad.pause.resumeEmulation, "OSD");
+        }
+        return ninjapad.utils.html("div", "pauseScreenContent", content);
     }
 
     return {
@@ -21,16 +29,21 @@ ninjapad.pause = function() {
 
         pauseScreen: pauseScreen,
 
-        pauseEmulation: function(content=null) {
+        setScreenContent: function(content) {
+            pauseScreen.content = content;
+            $("#pauseScreenContent").html(pauseScreen.content);
+        },
+
+        pauseEmulation: function(content=null, resumable=false) {
             ninjapad.emulator.pause();
             pauseScreen.visibility = "visible";
-            pauseScreen.content = content || pauseText();
+            pauseScreen.content = pauseText(content, resumable);
             ninjapad.jQElement.osd.empty();
             ninjapad.jQElement.osd.append(pauseScreen.content);
             ninjapad.jQElement.osd.css("visibility", pauseScreen.visibility);
-            state.isEmulationPaused = true;
+            ninjapad.jQElement.osd.css("transform", "translateZ(0)");
             ninjapad.utils.assign(null, "pauseScreenContent");
-            ninjapad.utils.assignNoPropagation(ninjapad.pause.resumeEmulation, "OSD", "end");
+            state.isEmulationPaused = true;
             DEBUG && console.log("NinjaPad: Emulation paused");
         },
 
@@ -41,7 +54,9 @@ ninjapad.pause = function() {
             pauseScreen.visibility = "hidden";
             ninjapad.jQElement.osd.css("visibility", pauseScreen.visibility);
             state.isEmulationPaused = false;
-            ninjapad.menu.state.isOpen = false;
+            ninjapad.menu.close();
+            ninjapad.utils.assignClick(null, "OSD");
+            ninjapad.utils.assignNoPropagation(null, "OSD", "end");
             DEBUG && console.log("NinjaPad: Emulation resumed");
         }
     };

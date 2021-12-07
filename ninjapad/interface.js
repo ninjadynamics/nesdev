@@ -25,11 +25,66 @@ ninjapad.interface = {
         var audio_samples_R = new Float32Array(SAMPLE_COUNT);
         var audio_write_cursor = 0, audio_read_cursor = 0;
 
+        var frameCounter = 0;
+
+        var controllerMappings = {  // DualShock 4
+            12: "BUTTON_UP",        // DPAD Up
+            13: "BUTTON_DOWN",      // DPAD Down
+            14: "BUTTON_LEFT",      // DPAD Left
+            15: "BUTTON_RIGHT",     // DPAD Right
+             0: "BUTTON_A",         // Cross
+             2: "BUTTON_B",         // Square
+             8: "BUTTON_SELECT",    // Share
+             9: "BUTTON_START"      // Options
+        }
+
+        var keyboardMappings = {
+            38: "BUTTON_UP",        // Up
+            87: "BUTTON_UP",        // W
+            40: "BUTTON_DOWN",      // Down
+            83: "BUTTON_DOWN",      // S
+            37: "BUTTON_LEFT",      // Left
+            65: "BUTTON_LEFT",      // A
+            39: "BUTTON_RIGHT",     // Right
+            68: "BUTTON_RIGHT",     // D
+            18: "BUTTON_A",         // Alt
+            88: "BUTTON_A",         // X
+            17: "BUTTON_B",         // Ctrl
+            90: "BUTTON_B",         // Z
+            32: "BUTTON_SELECT",    // Space
+            16: "BUTTON_SELECT",    // Right Shift
+            13: "BUTTON_START"      // Enter
+        }
+
+        var gpButtonPresses = {
+            "BUTTON_UP": false,
+            "BUTTON_DOWN": false,
+            "BUTTON_LEFT": false,
+            "BUTTON_RIGHT": false,
+            "BUTTON_A": false,
+            "BUTTON_B": false,
+            "BUTTON_SELECT": false,
+            "BUTTON_START": false
+        };
+
+        var kbButtonPresses = {
+            "BUTTON_UP": false,
+            "BUTTON_DOWN": false,
+            "BUTTON_LEFT": false,
+            "BUTTON_RIGHT": false,
+            "BUTTON_A": false,
+            "BUTTON_B": false,
+            "BUTTON_SELECT": false,
+            "BUTTON_START": false
+        };
+
         const nes = new jsnes.NES({
-            onFrame: function(framebuffer_24){
-                for(var i = 0; i < FRAMEBUFFER_SIZE; i++) framebuffer_u32[i] = 0xFF000000 | framebuffer_24[i];
+            onFrame: function(framebuffer_24) {
+                for (var i = 0; i < FRAMEBUFFER_SIZE; i++) framebuffer_u32[i] = 0xFF000000 | framebuffer_24[i];
+                ninjapad.recorder.read(frameCounter) || ninjapad.recorder.write(frameCounter);
+                ++frameCounter;
             },
-            onAudioSample: function(l, r){
+            onAudioSample: function(l, r) {
                 audio_samples_L[audio_write_cursor] = l;
                 audio_samples_R[audio_write_cursor] = r;
                 audio_write_cursor = (audio_write_cursor + 1) & SAMPLE_MASK;
@@ -48,14 +103,14 @@ ninjapad.interface = {
             return sampleRate;
         }
 
-        function onAnimationFrame(){
+        function onAnimationFrame() {
             window.setTimeout(onAnimationFrame, 1000/60);
             image.data.set(framebuffer_u8);
             canvas_ctx.putImageData(image, 0, 0);
-            nes.frame();
+            if (!ninjapad.pause.state.isEmulationPaused) nes.frame();
         }
 
-        function audio_remain(){
+        function audio_remain() {
             return (audio_write_cursor - audio_read_cursor) & SAMPLE_MASK;
         }
 
@@ -65,12 +120,12 @@ ninjapad.interface = {
             var dst = event.outputBuffer;
             var len = dst.length;
 
-            // Attempt to avoid buffer underruns.
-            if(audio_remain() < AUDIO_BUFFERING) nes.frame();
+            // Attempt to avoid buffer underruns
+            if(audio_remain() < AUDIO_BUFFERING && !ninjapad.pause.state.isEmulationPaused) nes.frame();
 
             var dst_l = dst.getChannelData(0);
             var dst_r = dst.getChannelData(1);
-            for(var i = 0; i < len; i++){
+            for (var i = 0; i < len; i++) {
                 var src_idx = (audio_read_cursor + i) & SAMPLE_MASK;
                 dst_l[i] = audio_samples_L[src_idx];
                 dst_r[i] = audio_samples_R[src_idx];
@@ -80,42 +135,17 @@ ninjapad.interface = {
         }
 
         function keyboard(callback, event) {
-            var player = 1;
-            var prevent = true;
-            switch(event.keyCode){
-                case 38: // UP
-                case 87: // W
-                    callback(player, jsnes.Controller.BUTTON_UP); break;
-                case 40: // Down
-                case 83: // S
-                    callback(player, jsnes.Controller.BUTTON_DOWN); break;
-                case 37: // Left
-                case 65: // A
-                    callback(player, jsnes.Controller.BUTTON_LEFT); break;
-                case 39: // Right
-                case 68: // D
-                    callback(player, jsnes.Controller.BUTTON_RIGHT); break;
-                case 18: // 'alt'
-                case 88: // 'x'
-                    callback(player, jsnes.Controller.BUTTON_A); break;
-                case 90: // 'z'
-                case 17: // 'ctrl'
-                    callback(player, jsnes.Controller.BUTTON_B); break;
-                case 32: // Space
-                case 16: // Right Shift
-                    callback(player, jsnes.Controller.BUTTON_SELECT); break;
-                case 13: // Return
-                    callback(player, jsnes.Controller.BUTTON_START); break;
-                default:
-                    prevent = false; break;
-            }
-
-            if (prevent){
-                event.preventDefault();
-            }
+            var id = event.keyCode;
+            var button = keyboardMappings[event.keyCode];
+            var isPressed = callback == buttonDown;
+            if (isPressed && kbButtonPresses[id]) return;
+            if (typeof(button) === "undefined") return;
+            callback(button);
+            kbButtonPresses[id] = isPressed;
+            event.preventDefault();
         }
 
-        function nes_init(canvas_id){
+        function nes_init(canvas_id) {
             var canvas = document.getElementById(canvas_id);
             canvas_ctx = canvas.getContext("2d");
             image = canvas_ctx.getImageData(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -137,39 +167,45 @@ ninjapad.interface = {
             document.addEventListener('keydown',          () => { audio_ctx.resume() });
         }
 
-        function nes_boot(rom_data){
+        function nes_boot(rom_data) {
             nes.loadROM(rom_data);
             window.requestAnimationFrame(onAnimationFrame);
         }
 
-        function nes_load_data(canvas_id, rom_data){
+        function nes_load_data(canvas_id, rom_data) {
             nes_init(canvas_id);
             nes_boot(rom_data);
         }
 
-        function nes_load_url(canvas_id, path){
+        function nes_load_url(canvas_id, path, callback, ...args) {
             nes_init(canvas_id);
-
             var req = new XMLHttpRequest();
             req.open("GET", path);
             req.overrideMimeType("text/plain; charset=x-user-defined");
             req.onerror = () => console.log(`Error loading ${path}: ${req.statusText}`);
-
             req.onload = function() {
                 if (this.status === 200) {
-                nes_boot(this.responseText);
-                } else if (this.status === 0) {
+                    nes_boot(this.responseText);
+                    DEBUG && console.log(
+                        `NinjaPad: ROM loaded [${
+                            ninjapad.gameList[getROMHash()] ||
+                            path.split("/").pop()
+                        }]`,
+                    );
+                    if (callback) callback(...args);
+                }
+                else if (this.status === 0) {
                     // Aborted, so ignore error
-                } else {
+                }
+                else {
                     req.onerror();
                 }
             };
-
             req.send();
         }
 
-        document.addEventListener('keydown', (event) => {keyboard(nes.buttonDown, event)});
-        document.addEventListener('keyup', (event) => {keyboard(nes.buttonUp, event)});
+        document.addEventListener('keydown', (event) => {keyboard(buttonDown, event)});
+        document.addEventListener('keyup', (event) => {keyboard(buttonUp, event)});
 
         /////////////////////
         // GAMEPAD SUPPORT
@@ -205,124 +241,57 @@ ninjapad.interface = {
 
         // Check all controllers to see if player has pressed any buttons.
         // If they have, store that as the current controller.
-        function findController()
-        {
-            var i = 0;
-            var j;
-
-            for (j in controllers)
-            {
+        function findController() {
+            for (var j in controllers) {
                 var controller = controllers[j];
-
-                for (i = 0; i < controller.buttons.length; i++)
-                {
+                for (var i = 0; i < controller.buttons.length; ++i) {
                     var val = controller.buttons[i];
                     var pressed = val == 1.0;
-                    if (typeof(val) == "object")
-                    {
+                    if (typeof(val) == "object") {
                         pressed = val.pressed;
                         val = val.value;
                     }
-
-                    if (pressed)
-                    {
+                    if (pressed) {
                         cur_controller_index = j;
                     }
                 }
             }
         }
 
-        function updateStatus()
-        {
-            if (!haveEvents)
-            {
+        function updateStatus() {
+            if (!haveEvents) {
                 scangamepads();
             }
 
             // If a controller has not yet been chosen, check for one now.
-            if (cur_controller_index == -1)
-            {
-              findController();
+            if (cur_controller_index == -1) {
+                findController();
             }
 
             // Allow for case where controller was chosen this frame
-            if (cur_controller_index != -1)
-            {
-                var i = 0;
-                var j;
-
+            if (cur_controller_index != -1) {
                 var controller = controllers[cur_controller_index];
-
-                for (i = 0; i < controller.buttons.length; i++)
-                {
-                    var val = controller.buttons[i];
-                    var pressed = val == 1.0;
-                    if (typeof(val) == "object")
-                    {
-                        pressed = val.pressed;
-                        val = val.value;
+                for (var i = 0; i < controller.buttons.length; i++) {
+                    if (typeof(controllerMappings[i]) === "undefined") {
+                        continue;
                     }
-
-                    var player = 1 //parseInt(j,10) + 1;
-
-                    if (pressed)
-                    {
+                    var button = controller.buttons[i];
+                    var id = controllerMappings[i];
+                    if (button.pressed) {
+                        if (gpButtonPresses[id]) continue;
+                        // - - - - - - - - - - - - - - - -
                         if (audio_ctx) audio_ctx.resume();
-                        var callback = nes.buttonDown;
-                        switch(i)
-                        {
-                            case 12: // UP
-                            callback(player, jsnes.Controller.BUTTON_UP); break;
-                            case 13: // Down
-                            callback(player, jsnes.Controller.BUTTON_DOWN); break;
-                            case 14: // Left
-                            callback(player, jsnes.Controller.BUTTON_LEFT); break;
-                            case 15: // Right
-                            callback(player, jsnes.Controller.BUTTON_RIGHT); break;
-                            case BUTTON_A: // 'A'
-                            callback(player, jsnes.Controller.BUTTON_A); break;
-                            case BUTTON_B: // 'B'
-                            callback(player, jsnes.Controller.BUTTON_B); break;
-                            case 8: // Select
-                            callback(player, jsnes.Controller.BUTTON_SELECT); break;
-                            case 9: // Start
-                            callback(player, jsnes.Controller.BUTTON_START); break;
-                        }
+                        buttonDown(id);
+                        gpButtonPresses[id] = true;
                     }
-                    else
-                    {
-                        var callback = nes.buttonUp;
-                        switch(i)
-                        {
-                            case 12: // UP
-                            callback(player, jsnes.Controller.BUTTON_UP); break;
-                            case 13: // Down
-                            callback(player, jsnes.Controller.BUTTON_DOWN); break;
-                            case 14: // Left
-                            callback(player, jsnes.Controller.BUTTON_LEFT); break;
-                            case 15: // Right
-                            callback(player, jsnes.Controller.BUTTON_RIGHT); break;
-                            case BUTTON_A: // 'A'
-                            callback(player, jsnes.Controller.BUTTON_A); break;
-                            case BUTTON_B: // 'B'
-                            callback(player, jsnes.Controller.BUTTON_B); break;
-                            case 8: // Select
-                            callback(player, jsnes.Controller.BUTTON_SELECT); break;
-                            case 9: // Start
-                            callback(player, jsnes.Controller.BUTTON_START); break;
-                        }
+                    else {
+                        if (!gpButtonPresses[id]) continue;
+                        // - - - - - - - - - - - - - - - -
+                        buttonUp(id);
+                        gpButtonPresses[id] = false;
                     }
-
-                    // var axes = d.getElementsByClassName("axis");
-                    // for (i = 0; i < controller.axes.length; i++)
-                    // {
-                        // var a = axes[i];
-                        // a.innerHTML = i + ": " + controller.axes[i].toFixed(4);
-                        // a.setAttribute("value", controller.axes[i] + 1);
-                    // }
                 }
             }
-
             requestAnimationFrame(updateStatus);
         }
 
@@ -346,6 +315,27 @@ ninjapad.interface = {
          setInterval(scangamepads, 500);
         }
 
+        function buttonDown(b) {
+            if (ninjapad.recorder.buffer(b, true)) return;
+            nes.buttonDown(1, eval("jsnes.Controller." + b));
+            ninjapad.layout.showButtonPress(b, true);
+        }
+
+        function buttonUp(b) {
+            if (ninjapad.recorder.buffer(b, false)) return;
+            nes.buttonUp(1, eval("jsnes.Controller." + b));
+            ninjapad.layout.showButtonPress(b, false);
+        }
+
+        function getROMHash() {
+            const data = nes.romData;
+            const arr = [];
+            for (var i = 16; i < data.length; ++i) {
+                arr.push(data.charCodeAt(i));
+            }
+            return sha1(arr);
+        }
+
         // If you wish to create your own interface,
         // you need to provide the exact same keys
         return {
@@ -359,25 +349,36 @@ ninjapad.interface = {
             }(),
 
             buttonDown: function(b) {
-                nes.buttonDown(1, eval("jsnes.Controller." + b));
+                buttonDown(b);
             },
 
             buttonUp: function(b) {
-                nes.buttonUp(1, eval("jsnes.Controller." + b));
+                buttonUp(b);
+            },
+
+            releaseAllButtons: function() {
+                buttonUp("BUTTON_UP");
+                buttonUp("BUTTON_DOWN");
+                buttonUp("BUTTON_LEFT");
+                buttonUp("BUTTON_RIGHT");
+                buttonUp("BUTTON_SELECT");
+                buttonUp("BUTTON_START");
+                buttonUp("BUTTON_A");
+                buttonUp("BUTTON_B");
             },
 
             pause: function() {
                 function _pause() {
                     if (nes.break) return;
                     // - - - - - - - - - - - - - - - - - - - - - - -
+                    nes.break = true;
                     if (audio_ctx && audio_ctx.suspend) {
                         audio_ctx.suspend();
                     }
                     audio_ctx = {
-                        resume: function(){},
+                        resume: function() {},
                         isNull: true
                     };
-                    nes.break = true;
                     if (typeof enforcePause === 'undefined') {
                         enforcePause = setInterval(_pause, 16);
                     }
@@ -411,6 +412,15 @@ ninjapad.interface = {
                 return nes.romData;
             },
 
+            getROMHash: function() {
+                return getROMHash();
+            },
+
+            getROMName: function() {
+                const hash = getROMHash();
+                return ninjapad.gameList[hash];
+            },
+
             saveState: function() {
                 const o = nes.toJSON();
                 const s = JSON.stringify(o);
@@ -427,11 +437,21 @@ ninjapad.interface = {
                 return !!nes.rom.header;
             },
 
-            initialize: function() {
-                nes_load_url(DISPLAY, DEFAULT_ROM);
-            }
+            frameCount: function() {
+                return frameCounter;
+            },
 
-            // ...
+            resetFrameCount: function() {
+                frameCounter = 0;
+            },
+
+            memory: function() {
+                return nes.cpu.mem;
+            },
+
+            initialize: function(callback, ...args) {
+                nes_load_url(DISPLAY, DEFAULT_ROM, callback, ...args);
+            }
         };
     }()
 };

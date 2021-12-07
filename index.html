@@ -1,19 +1,26 @@
+<!-- This is an example file -->
 <html>
     <head>
         <meta charset="utf-8">
-        <link rel="shortcut icon" type="image/x-icon" href="ninjapad/favicon.ico">
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+        <link rel="shortcut icon" type="image/x-icon" href="ninjapad/favicon.ico">
+        <title>Kingdom Crisis - Powered by NinjaPad</title>
+
+        <!-- jQuery is required for NinjaPad to work -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <!-- Path or URL of the emulator you're going to use -->
         <script src="ninjapad/emu/jsnes/jsnes.min.js"></script>
+        <!-- NinjaPad Interface -->
         <script src="ninjapad/ninjapad.js"></script>
-        <title>NES Platformer Demo</title>
+
         <style>
             body {
                 margin: 0;
                 padding: 0;
+                background-color: #222;
             }
 
-            #main {
+            #myCoolDiv {
                 width: 100%;
                 height: 100%;
                 background-color: #222;
@@ -47,11 +54,13 @@
         </style>
     </head>
     <body>
-        <div id="main">
+        <div id="myCoolDiv">
             <!-- REQUIRED BY NINJAPAD -->
-            <div id="emu-screen">
-                <canvas id="emu-canvas" width="256" height="240"/>
-            </div>
+                <!-- This is the emulator screen (as in the piece of glass that covers the display) -->
+                <div id="emu-screen">
+                    <!-- This is the emulator display (where the pixels are drawn) -->
+                    <canvas id="emu-canvas" width="256" height="240"/>
+                </div>
             <!-- End of REQUIRED BY NINJAPAD -->
         </div>
     </body>
