@@ -69,6 +69,10 @@ ninjapad.menu = function() {
                 `Input recorder ${inColor("lime", iRModes[iRMode])}`,
                 js=`ninjapad.menu.inputRecorder.selectMode(); ninjapad.menu.show.optionsMenu()`,
                 hide=!INPUT_RECORDER
+            ),
+            ninjapad.utils.link(
+                "Toggle button layout",
+                js="ninjapad.layout.toggleABLayout()"
             )
         );
     }
@@ -162,6 +166,7 @@ ninjapad.menu = function() {
         var color_off = ninjapad.utils.getCSSVar("#menu", "color");
         ninjapad.utils.changeButtonColor("#menu", color_off);
         ninjapad.pause.state.isEmulationPaused && ninjapad.pause.resumeEmulation();
+        clearInterval(countdown); countdown = null;
         fnESC = null; fnESCArgs = [];
         isOpen = false;
         return true;
@@ -393,12 +398,18 @@ ninjapad.menu = function() {
             closeMenuAndResumeEmulation();
         },
 
+        reload: function() {
+            if (isOpen) {
+                var color_on = ninjapad.utils.getCSSVar("#menu", "color_on");
+                ninjapad.utils.changeButtonColor("#menu", color_on, glow=true);
+                openMenu(mainMenu, closeMenuAndResumeEmulation);
+            }
+        },
+
         toggle: {
             mainMenu: function() {
                 if (isOpen) {
                     closeMenuAndResumeEmulation();
-                    clearInterval(countdown);
-                    countdown = null;
                     return;
                 }
                 // ninjapad.autosave(); -- TODO: Use web worker instead

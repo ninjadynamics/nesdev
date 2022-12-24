@@ -6,7 +6,7 @@ ninjapad.layout = function() {
     var elm;
     var emuScrWidth;
     var emuScrHeight;
-
+    var isGBLayout;
     var coldStart = true;
 
     function setOSDLayout() {
@@ -82,6 +82,20 @@ ninjapad.layout = function() {
         elm.osd.css("font-size", fontSize);
     }
 
+    function setABLayout(toggle=false) {
+        if (toggle) {
+            isGBLayout = !isGBLayout;
+        }
+        const rem = "x".repeat(isGBLayout);
+        const add = "x".repeat(!isGBLayout);
+        $("#BUTTON_A")
+            .removeClass("button_A" + rem)
+            .addClass("button_A" + add);
+        $("#MULTI_AB")
+            .removeClass("button_AB" + rem)
+            .addClass("button_AB" + add);
+    }
+
     function setMobileLayout() {
         DEBUG && console.log("NinjaPad: Mobile mode selected");
 
@@ -94,8 +108,11 @@ ninjapad.layout = function() {
             elm.recMenu.detach().appendTo(elm.emuScreen);
             elm.recStatus.detach().appendTo(elm.emuScreen);
             $("body *").not("#ninjaPad *").not("#ninjaPad").remove();
+            isGBLayout = GAMEBOY_LAYOUT;
             coldStart = false;
         }
+
+        setABLayout();
 
         var useJQuery = !ninjapad.utils.isFullScreen() || ninjapad.utils.isIOSDevice();
         var width = useJQuery ? $(window).width() : window.innerWidth;
@@ -263,6 +280,10 @@ ninjapad.layout = function() {
     }
 
     return {
+        toggleABLayout: function() {
+            setABLayout(true);
+        },
+
         setPageLayout: function() {
             loadVars();
             ninjapad.utils.isMobileDevice() ? setMobileLayout() : setDesktopLayout();
