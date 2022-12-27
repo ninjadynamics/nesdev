@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Ninja Dynamics - Donation Page</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  </head>
+  <body>
+  
+  <div class="container">
+    <img src="logo.png" alt="logo" class="logo">     
+    <p>Thank you for supporting my work!</p>
+    <p>You can donate using the following methods:</p>    
+    <button class="button" onclick="window.location='https://ko-fi.com/yourusername';">Donate on Ko-Fi</button>
+    <button class="button" onclick="copyAddress('placeholder', 'ETH');">Donate ETH</button>
+    <button class="button" onclick="copyAddress('placeholder', 'BTC');">Donate BTC</button>
+    <button class="button" onclick="copyAddress('placeholder', 'BTC Lightning');">Donate BTC Lightning</button>    
+    <div id="popup" class="popup" style="display:none;">
+      <p>Address copied to clipboard</p>
+      <div id="qr-code"></div>
+    </div>
+  </div>
+
+  </body>
+  <script>
+    function copyAddress(address, type) {
+      navigator.clipboard.writeText(address);
+      var popup = document.getElementById("popup");
+	  var qrCodeElement = document.getElementById("qr-code");
+      qrCodeElement.innerHTML = ""; // Clear the QR code element
+      var qr = new QRCode(document.getElementById("qr-code"), {
+        text: address
+      });
+      popup.style.display = "block";
+      popup.onclick = function() {
+        popup.style.display = "none";
+      };
+    }
+  </script>
+</html>
